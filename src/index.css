@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme{
+    --color-regular: #ffffff;
+    --color-secondary: #99a1af;
+    --color-mainselect:#404040;
+    --color-thumb-hover: #707070;
+    --color-action: oklch(70.7% 0.165 254.624);
+    --color-selected: #fb2c36;
+    --color-aside: #101828;
+    --color-main: #282828;
+    --color-upvote: #fb2c36;
+    --color-dnvote:oklch(67.3% 0.182 276.935);
+    --color-button: oklch(62.3% 0.214 259.815);
+}
+@layer components{
+    .absolute-center-x{
+        @apply left-[50%] translate-x-[-50%];
+    }
+    .absolute-center-y{
+        @apply top-[50%] translate-y-[-50%];
+    }
+}
+
+*{
+    outline: 0;
+}
+body{
+    background-color: var(--color-main);
+    width: 100%;
+}
+label{
+    user-select: none;
+}
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background: var(--color-main);
+  }
+::-webkit-scrollbar-thumb{
+    border-radius: 10px;
+    background: var(--color-mainselect);
+  }
+::-webkit-scrollbar-thumb:hover{
+  	background: var(--color-thumb-hover);
+  }
+::-webkit-scrollbar-thumb:active{
+  	background: var(--color-secondary);
+  }

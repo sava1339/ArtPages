@@ -1,0 +1,10 @@
+.save:checked ~ .button-save{
+    background: var(--color-regular);
+    svg{
+        fill: var(--color-selected);
+        stroke: var(--color-selected);
+    }
+    p{
+        color:var(--color-selected);
+    }
+}

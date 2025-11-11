@@ -1,0 +1,6 @@
+.vote-selector:has(.vote_increase:checked){
+    background: #fb2c36;
+}
+.vote-selector:has(.vote_decrease:checked){
+    background: oklch(67.3% 0.182 276.935);
+}
