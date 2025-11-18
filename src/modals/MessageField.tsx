@@ -11,7 +11,7 @@ interface IMessageField{
     selected?:boolean,
     textareaPlaceholder?:string,
     noresize?:boolean,
-    send:(userId: string, context: string) => void
+    send?:(userId: string, context: string) => void
 }
 
 function MessageField({
@@ -42,7 +42,7 @@ function MessageField({
         }
     }, [textValue,isSelected]);
     const sendMessage = () =>{
-        if(isAuth && userData){
+        if(isAuth && userData && send !== undefined){
             send(userData?.id,textValue);
             setTextValue("");
             setIsSelected(false);

@@ -7,7 +7,7 @@ interface IProfileAside{
     created_at:string
 }
 
-function ProfileAside({nickname,bio,created_at}:IProfileAside) {
+function ProfileAside({nickname,bio}:IProfileAside) {
     return ( 
         <Aside>
             <div className="flex flex-col gap-3 px-4">

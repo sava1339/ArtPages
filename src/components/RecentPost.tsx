@@ -19,7 +19,7 @@ function RecentPost({data}:IRecentPostEl) {
     const recentData:IPost|undefined = posts.filter((post) => post.id == data.postId)[0];
     const curCommunity:ICommunity|undefined = communityes.filter((community)=>community.id == recentData.community_id)[0];
     const lastUpdate = dayjs(recentData.created_at);
-    const {votePosts,vote} = useVotePost();
+    const {votePosts} = useVotePost();
     const votes = 
             votePosts.filter((vote)=>+vote.post_id === +recentData.id && vote.vote == true).length - 
             votePosts.filter((vote)=>+vote.post_id === +recentData.id && vote.vote == false).length

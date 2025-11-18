@@ -39,10 +39,10 @@ function Profile() {
         savePosts.some(save => save.postId === post.id)
     )
     const downvotePostList = posts.filter((post:IPost) => 
-        votePosts.some(vote => vote.postId === post.id && vote.vote === -1)
+        votePosts.some(vote => vote.post_id === post.id && vote.vote === false)
     )
     const upvotePostList = posts.filter((post:IPost) => 
-        votePosts.some(vote => vote.postId === post.id && vote.vote === 1)
+        votePosts.some(vote => vote.post_id === post.id && vote.vote === true)
     )
     const [sortType,setSortType] = useState("Просмотр");
     return ( 

@@ -39,7 +39,7 @@ export const useAuthUser = create<IUseAuthUser>((set,get)=>({
         if(avatar!=null){
             uploadImage();
         }
-        const {data,error} = await supabase
+        const {error} = await supabase
             .from("user")
             .insert(
             {
