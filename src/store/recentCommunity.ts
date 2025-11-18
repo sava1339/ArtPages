@@ -1,8 +1,8 @@
 import { create } from "zustand";
 
 interface IUseRecentCommunity{
-    recentCommunity:number[],
-    addRecentCommunity:(id:number)=>void
+    recentCommunity:string[],
+    addRecentCommunity:(id:string)=>void
 }
 
 export const useRecentCommunity = create<IUseRecentCommunity>((set,get)=>({

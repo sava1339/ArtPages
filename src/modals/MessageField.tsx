@@ -8,7 +8,7 @@ interface IMessageField{
     selected?:boolean,
     textareaPlaceholder?:string,
     noresize?:boolean,
-    send:(userId: number, context: string) => void
+    send:(userId: string, context: string) => void
 }
 
 function MessageField({
@@ -37,7 +37,7 @@ function MessageField({
         }
     }, [textValue,isSelected]);
     const sendMessage = () =>{
-        send(1,textValue);
+        send("1",textValue);
         setTextValue("");
         setIsSelected(false);
     }

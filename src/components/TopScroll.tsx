@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import "../styles/innershadow.css";
 import type { IPost } from '../interfaces/IPost';
+import TopScrollPost from './TopScrollPost';
 
 interface ITopScroll{
     posts:IPost[]
@@ -31,22 +32,7 @@ function TopScroll({posts}:ITopScroll) {
             <div className=" overflow-x-hidden">
                 <div style={{transform:`translateX(${topScroll}rem)`}} className="flex gap-4 transition-transform">
                     {posts.map((post)=>(
-                        <div className="relative cursor-pointer" key={post.id}>
-                            <div className="absolute bottom-0 p-2 z-1">
-                                <h2 className="text-[18px] font-bold text-ellipsis line-clamp-1">Новый супер крутой мега пост!</h2>
-                                <p className=" text-ellipsis line-clamp-1">Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam molestiae voluptas nesciunt possimus nemo architecto voluptatum amet corrupti voluptates officia quasi fuga doloremque maxime, ab sit accusantium suscipit labore vel.</p>
-                                <div className="flex items-center gap-1">
-                                    <img className="h-6" src="/vite.svg" alt="" />
-                                    <p className="text-[12px]">PublicName</p>
-                                    <p className="text-secondary text-[12px]">and more</p>
-                                </div>
-                            </div>
-                            <div className="inner-shadow absolute top-0 left-0 w-full h-full rounded-xl"></div>
-                            <div 
-                            className="w-64 h-48 bg-cover bg-center rounded-xl" 
-                            style={{backgroundImage:`url(${post.img})`}} 
-                            ></div>
-                        </div>
+                        <TopScrollPost key={post.id} post={post} />
                     ))}
                 </div>
             </div>

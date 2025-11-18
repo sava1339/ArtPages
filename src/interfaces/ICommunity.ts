@@ -1,5 +1,8 @@
 export interface ICommunity{
-    id:number,
-    img: string,
+    id:string,
+    created_at:string,
+    desc:string,
+    avatar_file_path:string,
     title: string,
+    avatar_file:string
 }

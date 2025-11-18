@@ -11,7 +11,7 @@ function RecentCommunity({id}:IRecentCommunity) {
     const curCommunity = communityes.filter(community => community.id === id)[0];
     return ( 
         <SidebarButton route={`/community/${curCommunity.title}`}>
-            <Avatar avatar={curCommunity.img} size="md"/>
+            <Avatar avatar={curCommunity.avatar_file || "/avatar.svg"} size="md"/>
             <p className='text-ellipsis line-clamp-1'>{curCommunity.title}</p>
         </SidebarButton>
      );

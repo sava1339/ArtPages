@@ -1,47 +1,56 @@
 import { create } from "zustand";
 import type { IVote } from "../interfaces/IVote";
+import supabase from "../supabaseClient";
 
 export interface IUseVotePost{
     votePosts:IVote[],
-    upvote:(id:number)=>void,
-    downvote:(id:number)=>void,
-    removeVote:(id:number)=>void,
+    vote:(post_id:string,user_id:string,vote:boolean|null,vote_id:string|undefined)=>void,
+    setVotes:(votes:IVote[])=> void,
 }
 
 export const useVotePost = create<IUseVotePost>((set,get)=>({
     votePosts:[
-        {
-            id:Date.now(),
-            postId:1,
-            vote:1
-        }
+        
     ],
-    upvote: (id)=>{
-        const newVoteList = get().votePosts.filter(vote => vote.postId != id);
+    vote: async(post_id,user_id,vote,vote_id)=>{
+        const newVoteList = get().votePosts.filter(vote => (vote.post_id == post_id && vote.user_id != user_id) || vote.post_id != post_id);
+        if(vote_id === undefined){
+            await supabase
+                .from("post_vote")
+                .insert([
+                    {
+                        post_id:post_id,
+                        user_id:user_id,
+                        vote:vote
+                    }
+                ])
+        }else{
+            await supabase
+                .from("post_vote")
+                .update({
+                        vote:vote
+                    })
+                .eq('id',vote_id)
+        }
         set({
             votePosts:[...newVoteList,
                 {
-                    id:Date.now(),
-                    postId:id,
-                    vote:1
+                    id:Date.now().toString(),
+                    post_id:post_id,
+                    user_id:user_id,
+                    vote:vote
                 }
             ]
         })
     },
-    downvote: (id)=>{
-        const newVoteList = get().votePosts.filter(vote => vote.postId != id);
+    setVotes: (votes)=>{
+        // const newVotes:IVote[] = get().votePosts.map(vote=>{
+        //     if(!votes.some(newVote => newVote.id === vote.id)) return vote;
+        // }) as IVote[];
         set({
-            votePosts:[...newVoteList,
-                {
-                    id:Date.now(),
-                    postId:id,
-                    vote:-1
-                }
+            votePosts:[
+                ...votes
             ]
         })
-    },
-    removeVote: (id)=>{
-        const newVoteList = get().votePosts.filter(vote => vote.postId != id);
-        set({votePosts:newVoteList});
     }
 }))

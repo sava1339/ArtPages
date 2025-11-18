@@ -3,28 +3,22 @@ import type { IComment } from "../interfaces/IComment";
 
 export interface IUseComments{
     comments:IComment[],
-    addComment:(userId:number,postId:number,context:string)=>void,
-    removeComment:(id:number)=>void
+    addComment:(userId:string,postId:string,context:string)=>void,
+    removeComment:(id:string)=>void
 }
 
 export const useComments = create<IUseComments>((set,get)=>({
     comments:[
-        {
-            id:1,
-            userId:1,
-            postId:1,
-            context:"Hello",
-            date:Date.now()
-        }
+        
     ],
     addComment: (userId,postId,context)=>(set((state)=>({
         comments:[
             {
-                id:Date.now(),
+                id:Date.now.toString(),
                 userId:userId,
                 postId:postId,
                 context:context,
-                date:Date.now()
+                date:Date.now.toString()
             },...state.comments
         ]
     }))),

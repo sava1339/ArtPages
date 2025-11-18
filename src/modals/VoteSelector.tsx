@@ -1,40 +1,46 @@
-import {useEffect, useState} from 'react';
 import "../styles/votes.css";
 import { useVotePost } from '../store/votePost.ts';
+import type { IVote } from '../interfaces/IVote.ts';
+import { useAuthUser } from '../store/authUser.ts';
+import { useNavigate } from "react-router-dom";
+import { AUTH } from "../utils/consts.ts";
 
 interface IVoteSelector{
-    initialVotes:number,
-    id:number,
+    id:string,
     view?:boolean
 }
 
 function VoteSelector({
-    initialVotes, 
     id,
     view
 }:IVoteSelector) {
-    const [vote,setVote] = useState(0);
-    const {votePosts,upvote,downvote,removeVote} = useVotePost((state)=>state);
-    const postVoteArr = votePosts.filter(post => post.postId === id);
-    const postVote:number = postVoteArr.length > 0 ? postVoteArr[0].vote : 0;
-
-    useEffect(()=>{
-        setVote(postVote);
-    },[votePosts])
-    
+    const {votePosts,vote} = useVotePost();
+    const navigate = useNavigate();
+    const {userData} = useAuthUser();
+    const postVote:IVote|undefined = votePosts.filter(vote => vote.post_id === id && vote.user_id.toString() === userData?.id)[0];
+    const curInitialVotes = 
+        votePosts.filter((vote:IVote)=>vote.post_id===id && vote.user_id != userData?.id && vote.vote == true).length - 
+        votePosts.filter((vote:IVote)=>vote.post_id===id && vote.user_id != userData?.id && vote.vote == false).length
     const Vote = (element:React.ChangeEvent<HTMLInputElement>) =>{
+        if(!userData){
+            navigate(AUTH);
+            return;
+        }
         const value = element.target.value;
         if(value == "1"){
-            upvote(id);
+            vote(id,userData?.id,true,postVote?.id);
         }else{
-            downvote(id);
+            vote(id,userData?.id,false,postVote?.id);
         }
     }
     const DoubleVote = (element:React.MouseEvent<HTMLInputElement>)=>{
-        if(element.target instanceof HTMLInputElement && +element.target.value === postVote){
+        if(element.target instanceof HTMLInputElement && (element.target.value === "1" ? true : false) === postVote?.vote){
+            if(!userData){
+                navigate(AUTH);
+                return;
+            }
             element.target.checked = false;
-            setVote(0);
-            removeVote(id);
+            vote(id,userData?.id,null,postVote?.id);
         }
     }
     return ( 
@@ -45,7 +51,7 @@ function VoteSelector({
         >
             <label className="group relative button-vote w-6 h-6 cursor-pointer flex justify-center">
                 <input 
-                    checked={postVote==1} 
+                    checked={postVote?.vote===true} 
                     onChange={(e)=>Vote(e)} 
                     onClick={(e:React.MouseEvent<HTMLInputElement>)=>DoubleVote(e)} 
                     className='vote_increase hidden' 
@@ -56,11 +62,11 @@ function VoteSelector({
                 <span className="z-2">+</span>
                 <div className="opacity-0 absolute w-full rounded-[50%] z-1 h-full top-0 left-0 bg-black group-hover:opacity-40"></div>
             </label>
-            <p className="text-[12px] font-bold">{initialVotes+vote}</p>
+            <p className="text-[12px] font-bold">{curInitialVotes+(postVote?.vote == null  ? 0 : postVote?.vote ? 1 : -1)}</p>
             
             <label className="group relative button-vote w-6 h-6 rounded-[50%] cursor-pointer flex justify-center">
                 <input 
-                    checked={postVote==-1} 
+                    checked={postVote?.vote===false} 
                     onChange={(e)=>Vote(e)} 
                     onClick={(e)=>DoubleVote(e)} 
                     className='vote_decrease hidden' 

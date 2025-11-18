@@ -1,8 +1,8 @@
 import { create } from "zustand";
 
 export interface IUsePostBlackList{
-    postBlackList:number[],
-    addPostInBL:(id:number)=>void
+    postBlackList:string[],
+    addPostInBL:(id:string)=>void
 }
 
 export const usePostBlackList = create<IUsePostBlackList>((set)=>({

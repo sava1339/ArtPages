@@ -4,7 +4,7 @@ import { useSavePosts } from '../store/savePosts';
 import '../styles/save.css';
 
 interface ISaveButton{
-    id:number
+    id:string
 }
 
 function SaveButton({id}:ISaveButton) {

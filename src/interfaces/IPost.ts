@@ -1,8 +1,11 @@
 export interface IPost{
-    id:number,
-    communityId:number,
-    userId:number,
-    img:string,
-    votes:number,
-    date:number
+    id:string,
+    community_id:string,
+    user_id:string,
+    post_file_path:string,
+    post_file:string,
+    title:string,
+    desc:string,
+    votes:any,
+    created_at:number
 }

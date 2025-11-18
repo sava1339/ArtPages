@@ -3,21 +3,21 @@ import type { ISavePost } from "../interfaces/ISavePosts";
 
 export interface IUseSavePosts{
     savePosts:ISavePost[],
-    savePost:(id:number)=>void,
-    unsavePost:(id:number)=>void
+    savePost:(id:string)=>void,
+    unsavePost:(id:string)=>void
 }
 
 export const useSavePosts = create<IUseSavePosts>((set,get)=>({
     savePosts:[
         {
-            id:1,
-            postId:1
+            id:"1",
+            postId:"1"
         }
     ],
     savePost: (id)=> set((state)=>({
         savePosts: [...state.savePosts,
             {
-                id:Date.now(),
+                id:Date.now().toString(),
                 postId:id,
             }
         ]

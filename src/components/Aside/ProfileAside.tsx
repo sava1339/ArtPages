@@ -1,11 +1,17 @@
 import TextButton from "../../modals/Buttons/TextButton";
 import Aside from "./Aside";
 
-function ProfileAside() {
+interface IProfileAside{
+    nickname:string,
+    bio:string,
+    created_at:string
+}
+
+function ProfileAside({nickname,bio,created_at}:IProfileAside) {
     return ( 
         <Aside>
             <div className="flex flex-col gap-3 px-4">
-                <p className="text-[18px] font-bold">UserNickName</p>
+                <p className="text-[18px] font-bold">{nickname}</p>
                 <div className="flex gap-2 flex-wrap">
                     <TextButton className="bg-main hover:bg-mainselect flex gap-2 px-4 py-2 w-fit">
                         <img className="h-4" src="/share.svg" alt="" />
@@ -21,7 +27,7 @@ function ProfileAside() {
                     </TextButton>
                 </div>
                 <p className="text-[14px] text-secondary font-semibold">13 followers</p>
-                <p className="text-[12px] text-secondary">Frontend developer, FURRY ARTIST, Rimworld modder</p>
+                <p className="text-[12px] text-secondary">{bio}</p>
                 <div className="grid grid-cols-2 gap-y-6 my-2">
                     <div className="flex flex-col">
                         <p className="text-[14px] font-semibold">2000</p>

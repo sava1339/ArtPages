@@ -5,23 +5,34 @@ interface IInput{
     className?:string,
     label?:string,
     maxSymbols?:number,
-    placeholder?:string
+    placeholder?:string,
+    password?:boolean,
+    isRequired?:boolean,
+    onValueChange?:(content:string)=>void,
 }
 
 function Input({
     className,
     label="",
     maxSymbols,
-    placeholder
+    placeholder,
+    password=false,
+    isRequired=false,
+    onValueChange
 }:IInput) {
     const [value,setValue] = useState("");
     const changeValueHandler = (e:React.ChangeEvent<HTMLInputElement>) =>{
         setValue(e.target.value);
+        if(onValueChange){
+            onValueChange(e.target.value);
+        }
     }
     return ( 
 
         <label className="flex flex-col gap-2">
-            {label}
+            <p>
+                {label} {isRequired && <span className=" text-red-500">*</span>}
+            </p>
             <div className="flex gap-2 flex-col justify-end">
                 <input 
                     className={clsx("bg-mainselect px-6 py-3 text-[18px] rounded-2xl border-mainselect border focus:border-white",
@@ -31,7 +42,7 @@ function Input({
                     onChange={(e)=>changeValueHandler(e)}
                     placeholder={placeholder}
                     maxLength={maxSymbols}
-                    type="text" 
+                    type={password ? "password" : "text"} 
                 />
                 {maxSymbols && <p className="text-secondary text-right mr-4">{maxSymbols-value.length}</p>}
             </div>

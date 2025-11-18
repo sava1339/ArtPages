@@ -40,8 +40,8 @@ function Sidebar() {
                         <img className='h-4 transition-transform group-open:rotate-180' src="/minimize.svg" alt="" />
                     </summary>
                     <ul>
-                        {recentCommunity.map((recent:number)=>(
-                            <RecentCommunity key={recent} id={recent} />
+                        {recentCommunity.map((recent:string)=>(
+                            <RecentCommunity key={recent} id={+recent} />
                         ))}
                     </ul>
                 </details>}
@@ -59,9 +59,9 @@ function Sidebar() {
                             <img className='h-6' src="/settingsalt.svg" alt="" />
                             <p>Менеджер сообществ</p>
                         </SidebarButton>
-                        {sortedCommunities.map((community)=>(
+                        {/* {sortedCommunities.map((community)=>(
                             <CommunityButton data={community} key={community.id} />
-                        ))}
+                        ))} */}
                     </ul>
                 </details>
             </nav>

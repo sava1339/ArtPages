@@ -1,4 +1,4 @@
 export interface IRecentPost{
-    id:number,
-    postId:number
+    id:string,
+    postId:string
 }

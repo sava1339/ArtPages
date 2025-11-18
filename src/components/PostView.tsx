@@ -30,10 +30,10 @@ function PostView({data}:IPostView) {
     const {communityes} = useCommunityes((state:IUseCommunityes)=>state);
     const {comments,addComment} = useComments((state)=>state);
     const filterComments = comments.filter(comment=>comment.postId === data.id);
-    const curCommunity = communityes.filter((community:ICommunity) => community.id === data.communityId)[0];
+    const curCommunity = communityes.filter((community:ICommunity) => community.id === data.community_id)[0];
     const {deselect} = useSelectedPost((state:IUseSelectedPost)=>state);
-    const lastUpdate = dayjs(data.date);
-    const sendComment = (userId:number,context:string) =>{
+    const lastUpdate = dayjs(data.created_at);
+    const sendComment = (userId:string,context:string) =>{
         addComment(userId,data.id,context);
     }
     return ( 
@@ -41,7 +41,7 @@ function PostView({data}:IPostView) {
             <div className="absolute absolute-center-x text-regular bg-main z-20 h-screen overflow-y-scroll w-[1000px] py-4 px-6 flex flex-col gap-4">
                 <div className="flex justify-between items-center">
                     <div className="flex gap-1 items-center text-[12px]">
-                        <Avatar className="cursor-pointer mr-1" avatar={curCommunity.img} size="md" />
+                        <Avatar className="cursor-pointer mr-1" avatar={curCommunity.avatar_file} size="md" />
                         <p className="font-bold text-[14px]">{curCommunity.title}</p>
                         <p>•</p>
                         <p className="text-secondary">{lastUpdate.fromNow()}</p>
@@ -65,24 +65,24 @@ function PostView({data}:IPostView) {
                         isVertical && 
                         <h2 className='font-bold text-[21px] text-regular'>Новый супер крутой мега пост!</h2>
                         }
-                        <div 
+                        {data.post_file && <div 
                             className={
                                 clsx(
-                                    "h-[600px]  flex justify-center relative overflow-hidden",
+                                    "h-[600px]  flex justify-center items-center relative overflow-hidden",
                                     {
                                         "w-[500px]":!isVertical,
                                         "w-full":isVertical
                                     }
                                 )}
                         >
-                            <img src={data.img} className="h-full absolute z-10" alt="" />
-                            <div style={{backgroundImage:`url(${data.img})`}} className="bg-center bg-cover blur-2xl top-0 left-0 w-full h-full" />
-                        </div>
+                            <img src={data.post_file} className="absolute z-10" alt="" />
+                            <div style={{backgroundImage:`url(${data.post_file})`}} className="bg-center bg-cover blur-2xl top-0 left-0 w-full h-full" />
+                        </div>}
                     </div>
                     <div className='flex-1 gap-2 flex flex-col'>
                         {
                         !isVertical && 
-                        <h2 className='font-bold text-[21px] text-regular'>Новый супер крутой мега пост!</h2>
+                        <h2 className='font-bold text-[21px] text-regular'>{data.title}</h2>
                         }
                         <p 
                         className={
@@ -91,7 +91,7 @@ function PostView({data}:IPostView) {
                                 "line-clamp-1 text-ellipsis":!isMoreContent
                             })
                         }>
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium reprehenderit maiores temporibus eos quaerat ad quis quia deserunt asperiores, error, recusandae suscipit similique minus sunt? Voluptatem sint ratione quam ipsam.
+                            {data.desc}
                         </p>
                         <TextButton 
                             action={()=>setIsMoreContent(!isMoreContent)} 
@@ -100,7 +100,7 @@ function PostView({data}:IPostView) {
                             {isMoreContent ? "Уменьшить" : "Больше..."}
                         </TextButton>
                         <div className='flex gap-2 mt-4'>
-                            <VoteSelector initialVotes={data.votes} id={data.id} view />
+                            <VoteSelector id={data.id} view />
                             <SaveButton id={data.id} />
                             <TextButton className="rounded-[999px] flex items-center gap-2 border-[0.5px] border-secondary hover:bg-secondary h-[26px]">
                                 <img className='h-4' src="/Chat.svg" alt="" />

@@ -1,5 +1,6 @@
 export interface IVote{
-    id:number,
-    postId:number,
-    vote:number
+    id:string,
+    post_id:string,
+    user_id:string,
+    vote:boolean|null
 }

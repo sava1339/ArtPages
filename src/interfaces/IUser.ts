@@ -1,7 +1,9 @@
 export interface IUser{
-    id:number,
-    avatar:string,
+    id:string,
+    avatar_file:string,
+    avatar_file_path:string,
     nickname:string,
+    login:string,
     bio:string,
-    signDate:number
+    created_at:string
 }

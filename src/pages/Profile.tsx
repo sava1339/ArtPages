@@ -6,15 +6,34 @@ import type { IPost } from "../interfaces/IPost";
 import { useSavePosts } from "../store/savePosts";
 import { useVotePost } from "../store/votePost";
 import { usePosts } from "../store/posts";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "../layouts/Layout";
-import { useIsSidebarExpand } from "../store/isSidebarExpand";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useDBUserCache } from "../components/hooks/useDBUserCache";
+import { IGetUserType } from "../interfaces/IGetUserType";
+import type { IUser } from "../interfaces/IUser";
 
 
 function Profile() {
+    const location = useLocation();
+    const navigate = useNavigate();
     const {posts} = usePosts((state)=>state);
     const {votePosts} = useVotePost((state)=>state);
     const {savePosts} = useSavePosts((state)=>state);
+    const [curUser,setCurUser] = useState<IUser>();
+    const {getUser} = useDBUserCache();
+
+    useEffect(()=>{
+        const getData = async()=>{
+            const user:IUser|null = await getUser(IGetUserType.byLogin,location.pathname.split("/")[2]);
+            if(user==null){
+                navigate("/home");
+                return;
+            };
+            setCurUser(user); 
+        }
+        getData();
+    },[])
 
     const savePostList = posts.filter((post:IPost) => 
         savePosts.some(save => save.postId === post.id)
@@ -28,14 +47,14 @@ function Profile() {
     const [sortType,setSortType] = useState("Просмотр");
     return ( 
         <Layout>
-            <div className="flex">
+            {curUser && <div className="flex">
                 <div className="flex w-[732px] flex-col gap-4 text-regular">
                     <div className="flex flex-col gap-4">
                         <div className="flex gap-3 ml-8 items-center">
                             <Avatar avatar="/avatar.jpg" size="xl"/>
                             <div className="flex flex-col gap-1">
-                                <h1 className="font-bold text-[21px]">UserNickName</h1>
-                                <p className="text-secondary text-[12px]">UserName</p>
+                                <h1 className="font-bold text-[21px]">{curUser.nickname}</h1>
+                                <p className="text-secondary text-[12px]">{curUser.login}</p>
                             </div>
                         </div>
                         <div className="flex gap-4">
@@ -70,8 +89,8 @@ function Profile() {
                         ))}
                     </div>
                 </div>
-                <ProfileAside/>
-            </div>
+                <ProfileAside nickname={curUser.nickname} bio={curUser.bio} created_at={curUser.created_at} />
+            </div>}
         </Layout>
      );
 }

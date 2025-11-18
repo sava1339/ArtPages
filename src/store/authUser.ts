@@ -1,0 +1,105 @@
+import { create } from "zustand";
+import type { IUser } from "../interfaces/IUser";
+import type { Session } from "@supabase/supabase-js";
+import bcrypt from "bcryptjs";
+import supabase from "../supabaseClient";
+import { v4 } from "uuid";
+
+interface IUseAuthUser{
+    isAuth:boolean,
+    userData:IUser|null,
+    session:Session|null,
+    signUp:(email:string,nickname:string,login:string,password:string,bio:string,avatar?:File|null)=>void,
+    signIn:(email:string,password:string)=>void,
+    signOut:()=>void,
+    auth:()=>void,
+    generateJWT:(password:string)=>Promise<string>,
+}
+
+export const useAuthUser = create<IUseAuthUser>((set,get)=>({
+    isAuth:false,
+    userData:null,
+    session:null,
+
+    signUp: async(email,nickname,login,password,bio,avatar)=>{
+        const hashPassword = await get().generateJWT(password);
+        const filename = avatar != null ? v4()+".jpg" : "99e0c52f-9ad8-43f9-8b0f-df76f44afc56.jpg";
+        const {data:signup,error:signupError} = await supabase.auth.signUp({
+            email:email,
+            password:password
+        })
+        if(signupError) throw signupError;
+        console.log(signup);
+        const uploadImage = async()=>{
+            const { error } = await supabase.storage
+                .from('avatar_images')
+                .upload(filename, avatar);
+            if (error) throw error;
+        }
+        if(avatar!=null){
+            uploadImage();
+        }
+        const {data,error} = await supabase
+            .from("user")
+            .insert(
+            {
+                id:signup.user?.id,
+                email:email,
+                nickname:nickname,
+                login:login,
+                password:hashPassword,
+                bio:bio,
+                avatar_file_path:filename,
+            }
+        );
+        if(error) throw error;
+    },
+    signOut:async()=>{
+        await supabase.auth.signOut();
+        set({
+            userData:null,
+            isAuth:false,
+            session:null
+        })
+    },
+    auth:async()=>{
+        const {data:authData,error:authError} = await supabase.auth
+            .getSession();
+        if(authError || !authData.session) return;
+        const {data:userData,error:userError} = await supabase
+            .from("user")
+            .select("*")
+            .eq("id",authData.session?.user.id)
+            .single();
+        if(userError) throw userError
+        set({
+            userData:userData,
+            isAuth:true,
+            session:authData.session
+        })
+    },
+    generateJWT:  async(password)=>{
+        const hashPassword:string = await bcrypt.hash(password,12);
+        return hashPassword;
+    },
+    signIn: async(email:string,password:string)=>{
+        const {data:user,error:userError} = await supabase
+            .from("user")
+            .select("*")
+            .eq("email",email)
+            .single();
+        if(userError) throw userError;
+        const isMatch = await bcrypt.compare(password,user.password);
+        if(!isMatch) throw new Error("Пароль не верный");
+        const {data:authData,error:authError} = await supabase.auth.signInWithPassword({
+            email:email,
+            password:password
+        })
+        if(authError) throw authError;
+        set({
+            userData:user,
+            isAuth:true,
+            session:authData.session
+        })
+    }
+}))

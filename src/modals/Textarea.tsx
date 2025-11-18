@@ -5,18 +5,23 @@ interface IInput{
     className?:string,
     label?:string
     maxSymbols?:number
-    placeholder?:string
+    placeholder?:string,
+    onValueChange?:(content:string)=>void
 }
 
 function Textarea({
     className,
     label="",
     maxSymbols,
-    placeholder
+    placeholder,
+    onValueChange
 }:IInput) {
     const [value,setValue] = useState("");
     const changeValueHandler = (e:React.ChangeEvent<HTMLTextAreaElement>) =>{
         setValue(e.target.value);
+        if(onValueChange){
+            onValueChange(e.target.value);
+        }
     }
     return ( 
 

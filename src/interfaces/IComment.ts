@@ -1,7 +1,7 @@
 export interface IComment{
-    id:number,
-    userId:number,
-    postId:number,
+    id:string,
+    userId:string,
+    postId:string,
     context:string,
-    date:number
+    date:string
 }

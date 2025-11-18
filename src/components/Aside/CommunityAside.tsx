@@ -1,15 +1,20 @@
 import Aside from "./Aside";
 
-function CommunityAside() {
+interface ICommunityAside{
+    title:string,
+    desc:string
+}
+
+function CommunityAside({title,desc}:ICommunityAside) {
     return ( 
         <Aside>
             <div className="flex flex-col gap-1 px-4">
-                <p className="text-[18px] font-bold">CommunityName</p>
+                <p className="text-[18px] font-bold">{title}</p>
                 <p className="text-[12px] font-bold">
-                    Здесь какой то рандомный текст сообщества да да очень интересно
+                    {title}
                 </p>
                 <p className="text-[12px] text-secondary">
-                    Здесь какой то рандомный текст сообщества, но этого текста должно быть больше, ну прям очень много, чтобы текст ушел вниз и его было прям правда много ну нас трочки так 3 а ещё я сегодня работал вкусно поел и всё хорошо у меня в жизни
+                    {desc}
                 </p>
                 <div className="flex gap-1 items-center my-2">
                     <img className="h-4" src="/new.svg" alt="" />

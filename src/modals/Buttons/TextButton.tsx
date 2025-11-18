@@ -18,7 +18,7 @@ function TextButton({
             <div 
             onClick={action} 
             className={clsx(
-                'rounded-[999px] text-[10px] cursor-pointer',
+                'rounded-[999px] text-[10px] cursor-pointer text-regular',
                 className,
                 {
                     "p-0":padding == "none",

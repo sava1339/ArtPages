@@ -3,22 +3,17 @@ import type { ISubCommunity } from "../interfaces/ISubCommunity";
 
 export interface IUseSubCommunityes{
     subCommunity:ISubCommunity[],
-    toggleFav:(id:number)=>void,
-    addSubCommunity:(id:number)=>void,
-    removeSubCommunity:(id:number)=>void
+    toggleFav:(id:string)=>void,
+    addSubCommunity:(id:string)=>void,
+    removeSubCommunity:(id:string)=>void
 }
 
 export const useSubCommunityes = create<IUseSubCommunityes>((set,get)=>({
     subCommunity:[
         {
-            id:1,
-            communityId:1,
+            id:"1",
+            communityId:"4",
             isFav: false
-        },
-        {
-            id:2,
-            communityId:2,
-            isFav: true
         }
     ],
     toggleFav: (id)=> set((state) => ({
@@ -31,7 +26,7 @@ export const useSubCommunityes = create<IUseSubCommunityes>((set,get)=>({
     addSubCommunity: (id)=> set((state)=>({
         subCommunity: [...state.subCommunity,
             {
-                id:Date.now(),
+                id:Date.now().toString(),
                 communityId:id,
                 isFav:false
             }

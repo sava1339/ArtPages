@@ -1,7 +1,15 @@
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 
-function FileSelector() {
+interface IFileSelector{
+    label?:string,
+    onFileChange?:(file:File)=>void
+}
+
+function FileSelector({
+    label="Выберите файл",
+    onFileChange
+    }:IFileSelector) {
     const [selectedFiles,setSelectedFiles] = useState<File[]>([]);
     const [isDragging,setIsDragging] = useState(false);
     const [imagePreview,setImagePreview] = useState<string | ArrayBuffer | null>();
@@ -9,6 +17,9 @@ function FileSelector() {
         if(event.target.files){
             const files = Array.from(event.target.files);
             setSelectedFiles(files);
+            if(onFileChange){
+                onFileChange(files[0])
+            }
         }
     }
     useEffect(()=>{
@@ -41,7 +52,7 @@ function FileSelector() {
     };
     return ( 
         <label className="flex flex-col">
-            Выберите файл
+            {label}
             <input 
                 className="hidden" 
                 type="file"
@@ -49,7 +60,7 @@ function FileSelector() {
                 multiple={false}
             />
             <div 
-                className={clsx("w-full h-[200px] overflow-hidden relative bg-cover bg-center flex justify-center items-center rounded-2xl mt-2 cursor-pointer",
+                className={clsx("w-full h-[200px] group overflow-hidden relative bg-cover bg-center flex justify-center items-center rounded-2xl mt-2 cursor-pointer",
                     {
                         "bg-aside":!isDragging,
                         "bg-secondary":isDragging,
@@ -70,7 +81,7 @@ function FileSelector() {
                     src={imagePreview}
                     alt="" 
                 />}
-                {!isDragging && <div className="flex gap-2 select-none z-10 items-center bg-mainselect px-4 py-1 rounded-[999px]">
+                {!isDragging && <div className="flex opacity-40 gap-2 select-none z-10 items-center bg-mainselect px-4 py-1 rounded-[999px] group-hover:opacity-100">
                     <img className="h-6" src="/image.svg" alt="" />
                     {selectedFiles.length == 0 ? <p>Файл не выбран</p>
                     : <p>{selectedFiles[0].name}</p>

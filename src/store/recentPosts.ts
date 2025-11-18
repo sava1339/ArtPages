@@ -3,8 +3,8 @@ import type { IRecentPost } from "../interfaces/IRecentPost";
 
 export interface IUseRecentPosts{
     recentPosts:IRecentPost[],
-    addRecent:(id:number)=>void,
-    removeRecent:(id:number)=>void,
+    addRecent:(id:string)=>void,
+    removeRecent:(id:string)=>void,
     cleanRecent:()=>void
 }
 
@@ -17,7 +17,7 @@ export const useRecentPosts = create<IUseRecentPosts>((set,get)=>({
         set({
             recentPosts:[...newRecentList,
                 {
-                    id:Date.now(),
+                    id:(Date.now()).toString(),
                     postId:id
                 }
             ]
