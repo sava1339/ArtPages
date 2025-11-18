@@ -9,9 +9,11 @@ import { useContextMenu } from './hooks/useContextMenu';
 import Avatar from '../modals/Avatar';
 import { useRecentPosts } from '../store/recentPosts';
 import { useCommunityes } from '../store/communityes';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { IPost } from '../interfaces/IPost';
 import { useSubCommunityes } from '../store/subCommunityes';
+import { useAuthUser } from '../store/authUser';
+import { AUTH } from '../utils/consts';
 
 interface IPostEl{
     data:IPost
@@ -19,6 +21,7 @@ interface IPostEl{
 
 function Post({data}:IPostEl) {
     dayjs.extend(relativeTime);
+    const navigate = useNavigate();
     const lastUpdate = dayjs(data.created_at);
     const {selectPost} = useSelectedPost((state)=>state);
     const contextMenu = useContextMenu();
@@ -26,15 +29,20 @@ function Post({data}:IPostEl) {
     const curCommunity = communityes.filter((community) => community.id === data.community_id)[0];
     const {addRecent} = useRecentPosts((state)=>state);
     const {subCommunity,addSubCommunity} = useSubCommunityes((state)=>state);
-    const isSub = subCommunity.some(community => community.communityId == data.community_id);
+    const {isAuth,userData} = useAuthUser();
+    const isSub = subCommunity.some(community => community.community_id == data.community_id);
     const postClickHandler = () =>{
         selectPost(data);
         addRecent(data.id);
     }
     const subCommunityHandler = ()=>{
-        addSubCommunity(data.community_id);
+        if(!isAuth || !userData){
+            navigate(AUTH);
+            return;
+        }
+        addSubCommunity(data.community_id,userData?.id);
     }
-    return ( 
+    return (
     <>
         <div onClick={postClickHandler} className="flex flex-col text-regular p-2 w-[700px] hover:bg-mainselect rounded-xl mt-2 cursor-pointer">
             <div className="flex justify-between items-center">
@@ -48,7 +56,7 @@ function Post({data}:IPostEl) {
                     {!isSub && <TextButton action={subCommunityHandler} className="bg-button hover:bg-action">Подписаться</TextButton>}
                     <div className='relative w-6 h-6 rounded-[50%] flex justify-center hover:bg-secondary'>
                         <div ref={contextMenu.ref}>
-                            {contextMenu.isOpen && <PostDrawer id={+data.id} />}
+                            {contextMenu.isOpen && <PostDrawer id={data.id} />}
                         </div>
                         <img onClick={contextMenu.switchOpen} className='w-6 rotate-90 cursor-pointer' src="/more.svg" alt="" />
                     </div>

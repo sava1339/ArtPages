@@ -2,6 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import Button from "./Buttons/Button";
 import TextButton from "./Buttons/TextButton";
 import clsx from "clsx";
+import { useAuthUser } from "../store/authUser";
+import { useNavigate } from "react-router-dom";
+import { AUTH } from "../utils/consts";
 
 interface IMessageField{
     placeholder?:string,
@@ -19,7 +22,9 @@ function MessageField({
     send
 }:IMessageField) {
     const [textValue,setTextValue] = useState('');
+    const navigate = useNavigate();
     const [isSelected,setIsSelected] = useState(selected ? true : false);
+    const {isAuth,userData} = useAuthUser();
     const fieldRef = useRef<HTMLTextAreaElement>(null);
     const HandleInputClick = () => {
         setIsSelected(true);
@@ -37,9 +42,13 @@ function MessageField({
         }
     }, [textValue,isSelected]);
     const sendMessage = () =>{
-        send("1",textValue);
-        setTextValue("");
-        setIsSelected(false);
+        if(isAuth && userData){
+            send(userData?.id,textValue);
+            setTextValue("");
+            setIsSelected(false);
+        }else{
+            navigate(AUTH);
+        }
     }
     return ( 
         <div className="bg-main border border-secondary text-regular w-full rounded-3xl my-4 px-4 py-3">

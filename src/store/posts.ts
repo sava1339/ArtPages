@@ -5,13 +5,12 @@ import supabase from "../supabaseClient";
 import { IGetPostType } from "../interfaces/IGetPostType";
 import type { ICommunity } from "../interfaces/ICommunity";
 import type { IUser } from "../interfaces/IUser";
-import { getUsersWithAvatar } from "../Controllers/userController";
-import { getCommunityesWithFiles } from "../Controllers/communityController";
 import { useCommunityes } from './communityes';
 import { useUser } from "./users";
 import type { IFetchPost } from "../interfaces/IFetchPost";
 import { useVotePost } from "./votePost";
 import type { IVote } from "../interfaces/IVote";
+import { get as getdb, set as setdb } from 'idb-keyval';
 
 export interface IUsePosts{
     posts:IPost[],
@@ -23,6 +22,7 @@ export interface IUsePosts{
     createPost:(title:string,desc:string,userId:number|string,communityId:number|string,image?:File)=>void,
     getPosts:(getPostType:IGetPostType,value?:string)=>void,
     getPostsAll:()=>Promise<IFetchPost[]>,
+    getPostsByCommunityId:(community_id:string)=>Promise<IFetchPost[]>,
     getPostsWithImages:(posts:IFetchPost[])=>Promise<IFetchPost[]>
 }
 
@@ -87,10 +87,11 @@ export const usePosts = create<IUsePosts>((set,get)=>({
                 if(post.post_file_path === null){
                     return post;
                 }
-                if(localStorage.getItem(post.post_file_path)!=null){
+                const image = await getdb(post.post_file_path);
+                if(image!=null){
                     return {
                         ...post,
-                        post_file:localStorage.getItem(post.post_file_path)
+                        post_file:image
                     }
                 }
                 try {
@@ -103,7 +104,7 @@ export const usePosts = create<IUsePosts>((set,get)=>({
                         reader.onload = () => resolve(reader.result as string);
                         reader.readAsDataURL(image);
                     });
-                    localStorage.setItem(post.post_file_path,dataURL);
+                    await setdb(post.post_file_path,dataURL);
                     return{
                         ...post,
                         post_file:dataURL
@@ -133,10 +134,28 @@ export const usePosts = create<IUsePosts>((set,get)=>({
                         voteList.push(vote);
                     })
                 });
-                userList = await getUsersWithAvatar(userList);
-                communityList = await getCommunityesWithFiles(communityList);
+                userList = await useUser.getState().getUsersWithAvatar(userList);
+                communityList = await useCommunityes.getState().getCommunityesWithFiles(communityList);
                 get().addPosts(postList);
                 useCommunityes.getState().addCommunityes(communityList);
+                useUser.getState().addUsers(userList);
+                useVotePost.getState().setVotes(voteList);
+                return;
+            }
+            case IGetPostType.byCommunityId:{
+                if(!value) return;
+                const data = await get().getPostsByCommunityId(value)
+                data.forEach(item => {
+                    const { community, votes, user, ...post } = item;
+                    postList.push(post as IPost);
+
+                    userList.push(user);
+                    votes.map((vote:IVote)=>{
+                        voteList.push(vote);
+                    })
+                });
+                userList = await useUser.getState().getUsersWithAvatar(userList);
+                get().addPosts(postList);
                 useUser.getState().addUsers(userList);
                 useVotePost.getState().setVotes(voteList);
                 return;
@@ -145,6 +164,18 @@ export const usePosts = create<IUsePosts>((set,get)=>({
                 return;
         }
     },
+    getPostsByCommunityId: async(community_id)=>{
+        const {data,error} = await supabase
+            .rpc("get_community_posts",{
+                page_limit: 10,
+                page_offset: 0,
+                community_id_param: community_id
+            })
+        if(error) throw error;
+        const flatData = data.map((post:any) => post.post_data);
+        const posts = await get().getPostsWithImages(flatData);
+        return posts;
+    },
     getPostsAll: async()=>{
         const {data,error} = await supabase
             .rpc("get_feed_posts",{
@@ -152,8 +183,8 @@ export const usePosts = create<IUsePosts>((set,get)=>({
                 page_offset: 0
             })
         if(error) throw error;
-        const flatData = data.map((post:any) => post.post_data)
-        const users = await get().getPostsWithImages(flatData);
-        return users;
+        const flatData = data.map((post:any) => post.post_data);
+        const posts = await get().getPostsWithImages(flatData);
+        return posts;
     }
 }))

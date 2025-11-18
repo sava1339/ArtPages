@@ -9,10 +9,10 @@ interface IUseAuthUser{
     isAuth:boolean,
     userData:IUser|null,
     session:Session|null,
-    signUp:(email:string,nickname:string,login:string,password:string,bio:string,avatar?:File|null)=>void,
-    signIn:(email:string,password:string)=>void,
-    signOut:()=>void,
-    auth:()=>void,
+    signUp:(email:string,nickname:string,login:string,password:string,bio:string,avatar?:File|null)=>Promise<void>,
+    signIn:(email:string,password:string)=>Promise<void>,
+    signOut:()=>Promise<void>,
+    auth:()=>Promise<void>,
     generateJWT:(password:string)=>Promise<string>,
 }
 
@@ -77,6 +77,7 @@ export const useAuthUser = create<IUseAuthUser>((set,get)=>({
             isAuth:true,
             session:authData.session
         })
+        return;
     },
     generateJWT:  async(password)=>{
         const hashPassword:string = await bcrypt.hash(password,12);

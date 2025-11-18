@@ -3,7 +3,7 @@ import SidebarButton from "../modals/Buttons/SidebarButton";
 import { useCommunityes } from "../store/communityes";
 
 interface IRecentCommunity{
-    id:number
+    id:string
 }
 
 function RecentCommunity({id}:IRecentCommunity) {

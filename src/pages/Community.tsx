@@ -9,10 +9,9 @@ import { useRecentCommunity } from "../store/recentCommunity.ts";
 import { useCommunityes } from "../store/communityes.ts";
 import { useSubCommunityes } from "../store/subCommunityes.ts";
 import Layout from "../layouts/Layout.tsx";
-import { getCommunityByTitle } from "../Controllers/communityController.ts";
 import type { ICommunity } from "../interfaces/ICommunity.ts";
-import { useDBCommunityCache } from "../components/hooks/useDBCommunityCache.ts";
 import { IGetCommunityType } from "../interfaces/IGetCommunityType.ts";
+import { IGetPostType } from "../interfaces/IGetPostType.ts";
 
 
 function Commutnity() {
@@ -20,8 +19,8 @@ function Commutnity() {
     const navigate = useNavigate();
     const [com,setCom] = useState<ICommunity | null>(null);
     const [isLoading,setIsLoading] = useState(true);
-    const {posts} = usePosts((state)=>state);
-    const {getCommunity} = useDBCommunityCache();
+    const {posts,getPosts} = usePosts((state)=>state);
+    const {getCommunity} = useCommunityes();
     const filteredPosts = posts.filter(post => post.community_id === com?.id);
     // const {addRecentCommunity} = useRecentCommunity((state)=>state);
     // const {communityes,addCommunityes} = useCommunityes((state)=>state);
@@ -34,6 +33,7 @@ function Commutnity() {
         const getData = async()=>{
             const community:ICommunity|null = await getCommunity(IGetCommunityType.byTitle,location.pathname.split('/')[2]);
             if(community === null) alert("Произошла ошибка");
+            getPosts(IGetPostType.byCommunityId,community?.id);
             setCom(community);
             setIsLoading(false);
         }

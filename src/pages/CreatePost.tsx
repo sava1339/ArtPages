@@ -9,10 +9,10 @@ import { useEffect, useState } from "react";
 import FileSelector from "../modals/FileSelector";
 import type { ICommunity } from "../interfaces/ICommunity";
 import Avatar from "../modals/Avatar";
-import { useDBCommunityCache } from "../components/hooks/useDBCommunityCache";
 import { IGetCommunityType } from "../interfaces/IGetCommunityType";
 import { usePosts } from "../store/posts";
 import { useAuthUser } from "../store/authUser";
+import { useCommunityes } from "../store/communityes";
 
 function CreatePost() {
     const navigate = useNavigate();
@@ -23,7 +23,7 @@ function CreatePost() {
     const [image,setImage] = useState<File>();
     const [com,setCom] = useState<ICommunity|null>(null);
     const {createPost} = usePosts();
-    const {getCommunity} = useDBCommunityCache();
+    const {getCommunity} = useCommunityes();
     const {userData} = useAuthUser();
     const params = new URLSearchParams(location.search);
     const type = params.get("type");

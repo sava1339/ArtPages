@@ -9,9 +9,9 @@ import { usePosts } from "../store/posts";
 import { useEffect, useState } from "react";
 import Layout from "../layouts/Layout";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDBUserCache } from "../components/hooks/useDBUserCache";
 import { IGetUserType } from "../interfaces/IGetUserType";
 import type { IUser } from "../interfaces/IUser";
+import { useUser } from "../store/users";
 
 
 function Profile() {
@@ -21,7 +21,7 @@ function Profile() {
     const {votePosts} = useVotePost((state)=>state);
     const {savePosts} = useSavePosts((state)=>state);
     const [curUser,setCurUser] = useState<IUser>();
-    const {getUser} = useDBUserCache();
+    const {getUser} = useUser();
 
     useEffect(()=>{
         const getData = async()=>{

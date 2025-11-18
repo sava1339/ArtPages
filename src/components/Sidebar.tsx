@@ -12,7 +12,7 @@ function Sidebar() {
     const {recentCommunity} = useRecentCommunity((state)=>state);
     const {isSidebarExpand,toggleSidebar} = useIsSidebarExpand((state)=>state);
     const sortedCommunities = [...subCommunity].sort((a, b) => 
-        Number(b.isFav) - Number(a.isFav)
+        Number(b.is_favorite) - Number(a.is_favorite)
     );
     return ( 
         <div
@@ -41,7 +41,7 @@ function Sidebar() {
                     </summary>
                     <ul>
                         {recentCommunity.map((recent:string)=>(
-                            <RecentCommunity key={recent} id={+recent} />
+                            <RecentCommunity key={recent} id={recent} />
                         ))}
                     </ul>
                 </details>}
@@ -59,9 +59,9 @@ function Sidebar() {
                             <img className='h-6' src="/settingsalt.svg" alt="" />
                             <p>Менеджер сообществ</p>
                         </SidebarButton>
-                        {/* {sortedCommunities.map((community)=>(
+                        {sortedCommunities.map((community)=>(
                             <CommunityButton data={community} key={community.id} />
-                        ))} */}
+                        ))}
                     </ul>
                 </details>
             </nav>

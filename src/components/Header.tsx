@@ -6,6 +6,7 @@ import Avatar from '../modals/Avatar';
 import { useAuthUser } from '../store/authUser';
 import TextButton from '../modals/Buttons/TextButton';
 import { useNavigate } from 'react-router-dom';
+import { POPULAR_ROUTE } from '../utils/consts';
 
 interface IHeader{
     ChatOpen:()=>void
@@ -13,15 +14,15 @@ interface IHeader{
 
 function Header({ChatOpen}:IHeader) {
     const contextMenu = useContextMenu();
-    const {isAuth,userData} = useAuthUser();
+    const {isAuth} = useAuthUser();
     const navigate = useNavigate();
     const notificationCount = 12;
     const messagesCount = 6;
     return ( 
         <header className="w-[-webkit-fill-available] fixed py-2 px-4 border-b border-secondary bg-main z-40">
             <div className="flex justify-between items-center">
-                <div className="flex gap-6 text-regular items-center">
-                    <img className="cursor-pointer" src="/vite.svg" alt="" />
+                <div onClick={()=>navigate(POPULAR_ROUTE)} className="flex gap-6 text-regular items-center">
+                    <img className="cursor-pointer h-10" src="/logo.svg" alt="" />
                 </div>
                 <Search/>
                 {isAuth ? <div className="relative flex gap-2  text-regular items-center">

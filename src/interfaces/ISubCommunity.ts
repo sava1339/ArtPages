@@ -1,5 +1,6 @@
 export interface ISubCommunity{
     id:string,
-    communityId:string,
-    isFav: boolean
+    community_id:string,
+    user_id:string,
+    is_favorite: boolean
 }

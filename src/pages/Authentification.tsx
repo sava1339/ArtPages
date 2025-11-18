@@ -35,8 +35,8 @@ function Authentification() {
                 password === repeatPassword &&
                 email.includes("@") 
             ){
-                signUp(email,nickname,login,password,bio,avatar);
-                navigate("/home");
+                await signUp(email,nickname,login,password,bio,avatar);
+                navigate(0);
             }else{
                 alert("Введены некорректные данные");
             }
@@ -45,8 +45,8 @@ function Authentification() {
                 email.includes("@") &&
                 password.length > 6
             ){
-                signIn(email,password);
-                navigate("/home");
+                await signIn(email,password);
+                navigate(0);
             }else{
                 alert("Введены некорректные данные");
             }

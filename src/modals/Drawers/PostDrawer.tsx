@@ -3,7 +3,7 @@ import { usePosts } from "../../store/posts";
 import Drawer from "./Drawer";
 
 interface IPostDrawer{
-    id:number,
+    id:string,
 }
 
 function PostDrawer({id}:IPostDrawer) {

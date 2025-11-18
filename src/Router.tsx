@@ -8,17 +8,27 @@ import Chat from './components/Chat';
 import { useAuthUser } from './store/authUser';
 import { HOME_ROUTE } from './utils/consts';
 import { routes_anon, routes_auth } from './routes/routes';
+import { useSubCommunityes } from './store/subCommunityes';
+import { useRecentCommunity } from './store/recentCommunity';
 
 function App() {
   const [isChatOpen,setIsChatOpen] = useState(false);
-  const {auth,isAuth} = useAuthUser();
+  const {getSubCommunity} = useSubCommunityes();
+  const {getRecentCommunityes} = useRecentCommunity();
+  const {auth,isAuth,userData} = useAuthUser();
   const selectedPost = useSelectedPost((state)=>state.selectedPost);
   const ChatOpen = () =>{
     setIsChatOpen(!isChatOpen);
   }
   useEffect(()=>{
-        auth();
-    },[])
+    auth();
+  },[])
+  useEffect(()=>{
+    if(isAuth && userData){
+      getSubCommunity(userData.id);
+      getRecentCommunityes();
+    }
+  },[isAuth])
   return (
     <>
       <Header ChatOpen={ChatOpen} />

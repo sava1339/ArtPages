@@ -18,6 +18,7 @@ import type { IUseCommunityes } from '../store/communityes';
 import type { ICommunity } from '../interfaces/ICommunity';
 import type { IUseSelectedPost } from '../store/selectedPost';
 import { useComments } from '../store/comments';
+import { useUser } from '../store/users';
 
 interface IPostView{
     data:IPost
@@ -29,6 +30,8 @@ function PostView({data}:IPostView) {
     const {isVertical,verticalToggle} = useIsVertical((state:IUseIsVertical)=>state);
     const {communityes} = useCommunityes((state:IUseCommunityes)=>state);
     const {comments,addComment} = useComments((state)=>state);
+    const {users} = useUser();
+    const curUser = users.filter(user=> user.id === data.user_id)[0];
     const filterComments = comments.filter(comment=>comment.postId === data.id);
     const curCommunity = communityes.filter((community:ICommunity) => community.id === data.community_id)[0];
     const {deselect} = useSelectedPost((state:IUseSelectedPost)=>state);
@@ -42,9 +45,14 @@ function PostView({data}:IPostView) {
                 <div className="flex justify-between items-center">
                     <div className="flex gap-1 items-center text-[12px]">
                         <Avatar className="cursor-pointer mr-1" avatar={curCommunity.avatar_file} size="md" />
-                        <p className="font-bold text-[14px]">{curCommunity.title}</p>
-                        <p>•</p>
-                        <p className="text-secondary">{lastUpdate.fromNow()}</p>
+                        <div className='flex flex-col'>
+                            <div className='flex gap-1'>
+                                <p className="font-bold text-[12px]">{curCommunity.title}</p>
+                                <p>•</p>
+                                <p className="text-secondary">{lastUpdate.fromNow()}</p>
+                            </div>
+                            <p className=" text-[10px] text-secondary">{curUser.login}</p>
+                        </div>
                     </div>
                     <div className='flex gap-2'>
                         <Button imgSize='xs2' action={verticalToggle} img="/rotate.svg" />
@@ -63,7 +71,7 @@ function PostView({data}:IPostView) {
                     <div className='flex flex-col gap-8'>
                         {
                         isVertical && 
-                        <h2 className='font-bold text-[21px] text-regular'>Новый супер крутой мега пост!</h2>
+                        <h2 className='font-bold text-[21px] text-regular'>{data.title}</h2>
                         }
                         {data.post_file && <div 
                             className={

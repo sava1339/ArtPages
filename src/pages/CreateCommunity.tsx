@@ -6,13 +6,14 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../layouts/Layout";
 import FileSelector from "../modals/FileSelector";
 import { useState } from "react";
-import { createCommunity } from "../Controllers/communityController";
+import { useCommunityes } from "../store/communityes";
 
 function CreateCommunity() {
     const navigate = useNavigate();
     const [desc,setDesc] = useState<string>("");
     const [title,setTitle] = useState<string>("");
     const [avatar,setAvatar] = useState<File>();
+    const {createCommunity} = useCommunityes();
     const createCommunityHandler = async() =>{
         if(avatar==undefined || title.length < 4){
             alert("Данные некоректны или не введены");

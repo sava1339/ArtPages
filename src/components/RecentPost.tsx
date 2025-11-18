@@ -21,8 +21,8 @@ function RecentPost({data}:IRecentPostEl) {
     const lastUpdate = dayjs(recentData.created_at);
     const {votePosts,vote} = useVotePost();
     const votes = 
-            votePosts.filter((vote)=>vote.post_id=== +recentData.id && vote.vote == true).length - 
-            votePosts.filter((vote)=>vote.post_id=== +recentData.id && vote.vote == false).length
+            votePosts.filter((vote)=>+vote.post_id === +recentData.id && vote.vote == true).length - 
+            votePosts.filter((vote)=>+vote.post_id === +recentData.id && vote.vote == false).length
     return ( 
         <div className="flex justify-between gap-4 mx-3">
             <div className="flex flex-col flex-1 gap-2">
