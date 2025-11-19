@@ -1,4 +1,5 @@
 export interface ISavePost{
     id:string,
-    postId:string
+    post_id:string,
+    user_id:string
 }

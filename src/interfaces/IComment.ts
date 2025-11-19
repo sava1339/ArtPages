@@ -1,7 +1,7 @@
 export interface IComment{
     id:string,
-    userId:string,
-    postId:string,
+    user_id:string,
+    post_id:string,
     context:string,
-    date:string
+    created_at:string
 }

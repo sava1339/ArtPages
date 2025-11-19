@@ -78,7 +78,7 @@ function Post({data}:IPostEl) {
                 <SaveButton id={data.id} />
                 <TextButton action={postClickHandler} className="rounded-[999px] flex items-center gap-2 border-[0.5px] border-secondary hover:bg-secondary h-[26px]">
                     <img className='h-4' src="/Chat.svg" alt="" />
-                    <p className='text-[12px] font-semibold'>230</p>
+                    <p className='text-[12px] font-semibold'>{data.comment_count}</p>
                 </TextButton>
                 <TextButton className="rounded-[999px] flex items-center gap-2 border-[0.5px] border-secondary hover:bg-secondary h-[26px]">
                     <img className='h-4' src="/share.svg" alt="" />

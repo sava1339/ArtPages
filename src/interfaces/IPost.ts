@@ -7,5 +7,6 @@ export interface IPost{
     title:string,
     desc:string,
     votes:any,
-    created_at:number
+    created_at:number,
+    comment_count:number
 }

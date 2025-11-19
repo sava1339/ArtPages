@@ -10,9 +10,9 @@ interface ICommentEl{
 
 function Comment({comment}:ICommentEl) {
     dayjs.extend(relativeTime);
-    const lastUpdate = dayjs(comment.date);
+    const lastUpdate = dayjs(comment.created_at);
     const {users} = useUser();
-    const curUser = users.filter(user=> user.id === comment.userId)[0];
+    const curUser = users.filter(user=> user.id === comment.user_id)[0];
     return ( 
         <div className='flex gap-2'>
             <Avatar className="cursor-pointer mr-1" avatar={curUser.avatar_file} size="md" />

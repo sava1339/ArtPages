@@ -1,22 +1,28 @@
-import type { ISavePost } from '../interfaces/ISavePosts';
+import { useNavigate } from 'react-router-dom';
+import { useAuthUser } from '../store/authUser';
 import type { IUseSavePosts } from '../store/savePosts';
 import { useSavePosts } from '../store/savePosts';
 import '../styles/save.css';
+import { AUTH } from '../utils/consts';
 
 interface ISaveButton{
     id:string
 }
 
 function SaveButton({id}:ISaveButton) {
+    const navigate = useNavigate();
     const {savePosts,savePost,unsavePost} = useSavePosts((state:IUseSavePosts)=>state);
-    const savePostArr = savePosts.filter((post:ISavePost) => post.postId === id);
-    const isSavePost = savePostArr.length > 0;
-
+    const {isAuth,userData} = useAuthUser();
+    const isSavePost = savePosts.some(save => save.post_id === id && save.user_id === userData?.id);
     const Save = () =>{
+        if(!isAuth || !userData){
+            navigate(AUTH);
+            return;
+        }
         if(isSavePost){
-            unsavePost(id);
+            unsavePost(id,userData?.id);
         }else{
-            savePost(id);
+            savePost(id,userData?.id);
         }
     }
     return ( 

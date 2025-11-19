@@ -5,7 +5,7 @@ import VoteSelector from "../modals/VoteSelector";
 import SaveButton from "../modals/SaveButton";
 import MessageField from '../modals/MessageField';
 import TextButton from '../modals/Buttons/TextButton';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {clsx} from 'clsx';
 import Comment from './Comment';
 import Button from '../modals/Buttons/Button';
@@ -29,16 +29,19 @@ function PostView({data}:IPostView) {
     const [isMoreContent,setIsMoreContent] = useState(true);
     const {isVertical,verticalToggle} = useIsVertical((state:IUseIsVertical)=>state);
     const {communityes} = useCommunityes((state:IUseCommunityes)=>state);
-    const {comments,addComment} = useComments((state)=>state);
+    const {comments,sendComment,getCommentsByPost} = useComments((state)=>state);
     const {users} = useUser();
     const curUser = users.filter(user=> user.id === data.user_id)[0];
-    const filterComments = comments.filter(comment=>comment.postId === data.id);
+    const filterComments = comments.filter(comment=>comment.post_id === data.id);
     const curCommunity = communityes.filter((community:ICommunity) => community.id === data.community_id)[0];
     const {deselect} = useSelectedPost((state:IUseSelectedPost)=>state);
     const lastUpdate = dayjs(data.created_at);
-    const sendComment = (userId:string,context:string) =>{
-        addComment(userId,data.id,context);
+    const sendCommentHandler = (userId:string,context:string) =>{
+        sendComment(userId,data.id,context);
     }
+    useEffect(()=>{
+        getCommentsByPost(data.id);
+    },[])
     return ( 
         <div className="fixed top-0 h-screen z-40 w-screen">
             <div className="absolute absolute-center-x text-regular bg-main z-20 h-screen overflow-y-scroll w-[1000px] py-4 px-6 flex flex-col gap-4">
@@ -112,14 +115,14 @@ function PostView({data}:IPostView) {
                             <SaveButton id={data.id} />
                             <TextButton className="rounded-[999px] flex items-center gap-2 border-[0.5px] border-secondary hover:bg-secondary h-[26px]">
                                 <img className='h-4' src="/Chat.svg" alt="" />
-                                <p className='text-[12px] font-semibold'>230</p>
+                                <p className='text-[12px] font-semibold'>{data.comment_count}</p>
                             </TextButton>
                             <TextButton className="rounded-[999px] flex items-center gap-2 border-[0.5px] border-secondary hover:bg-secondary h-[26px]">
                                 <img className='h-4' src="/share.svg" alt="" />
                                 <p className='text-[12px] font-semibold'>Поделится</p>
                             </TextButton>
                         </div>
-                        <MessageField send={sendComment} placeholder="Присоеденись к обсуждению!" />
+                        <MessageField send={sendCommentHandler} placeholder="Присоеденись к обсуждению!" />
                         <div className='flex flex-col gap-2'>
                             {filterComments.map(comment=>(
                                 <Comment comment={comment} key={comment.id} />

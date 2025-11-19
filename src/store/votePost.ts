@@ -15,7 +15,7 @@ export const useVotePost = create<IUseVotePost>((set,get)=>({
     vote: async(post_id,user_id,vote,vote_id)=>{
         const newVoteList = get().votePosts.filter(vote => (vote.post_id == post_id && vote.user_id != user_id) || vote.post_id != post_id);
         if(vote_id === undefined){
-            await supabase
+            const {data,error} = await supabase
                 .from("post_vote")
                 .insert([
                     {
@@ -24,6 +24,19 @@ export const useVotePost = create<IUseVotePost>((set,get)=>({
                         vote:vote
                     }
                 ])
+                .select("id")
+                .single();
+            if(error) throw error;
+            set({
+                votePosts:[...newVoteList,
+                    {
+                        id:data.id,
+                        post_id:post_id,
+                        user_id:user_id,
+                        vote:vote
+                    }
+                ]
+            })
         }else{
             await supabase
                 .from("post_vote")
@@ -31,17 +44,17 @@ export const useVotePost = create<IUseVotePost>((set,get)=>({
                         vote:vote
                     })
                 .eq('id',vote_id)
+            set({
+                votePosts:[...newVoteList,
+                    {
+                        id:vote_id,
+                        post_id:post_id,
+                        user_id:user_id,
+                        vote:vote
+                    }
+                ]
+            })
         }
-        set({
-            votePosts:[...newVoteList,
-                {
-                    id:Date.now().toString(),
-                    post_id:post_id,
-                    user_id:user_id,
-                    vote:vote
-                }
-            ]
-        })
     },
     setVotes: (votes)=>{
         // const newVotes:IVote[] = get().votePosts.map(vote=>{

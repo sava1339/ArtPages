@@ -10,11 +10,13 @@ import { HOME_ROUTE } from './utils/consts';
 import { routes_anon, routes_auth } from './routes/routes';
 import { useSubCommunityes } from './store/subCommunityes';
 import { useRecentCommunity } from './store/recentCommunity';
+import { useSavePosts } from './store/savePosts';
 
 function App() {
   const [isChatOpen,setIsChatOpen] = useState(false);
   const {getSubCommunity} = useSubCommunityes();
   const {getRecentCommunityes} = useRecentCommunity();
+  const {getSaveByUser} = useSavePosts();
   const {auth,isAuth,userData} = useAuthUser();
   const selectedPost = useSelectedPost((state)=>state.selectedPost);
   const ChatOpen = () =>{
@@ -27,6 +29,7 @@ function App() {
     if(isAuth && userData){
       getSubCommunity(userData.id);
       getRecentCommunityes();
+      getSaveByUser(userData.id);
     }
   },[isAuth])
   return (
