@@ -36,7 +36,7 @@ export const useSavePosts = create<IUseSavePosts>((set,get)=>({
     },
     getSaveByUser:async(user_id)=>{
         if(get().savePosts.length != 0 ) return;
-        const {data,error} = await supabase
+        const {data} = await supabase
             .from("saved_post")
             .select("*")
             .eq("user_id",user_id);

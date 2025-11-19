@@ -36,7 +36,7 @@ function Profile() {
     },[])
 
     const savePostList = posts.filter((post:IPost) => 
-        savePosts.some(save => save.postId === post.id)
+        savePosts.some(save => save.post_id === post.id)
     )
     const downvotePostList = posts.filter((post:IPost) => 
         votePosts.some(vote => vote.post_id === post.id && vote.vote === false)
