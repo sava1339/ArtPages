@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import Drawer from "./Drawer";
 import { useAuthUser } from "../../store/authUser";
+import Avatar from "../Avatar";
 
 interface IProfileDrawer{
     drawerSwitch:()=>void
@@ -16,9 +17,7 @@ function ProfileDrawer({drawerSwitch}:IProfileDrawer) {
     return ( 
         <Drawer gap="none">
             <Link onClick={drawerSwitch} to={"/user/"+userData?.login} className="px-3 py-4 flex gap-2 items-center cursor-pointer select-none active:bg-mainselect">
-                <div className="rounded-[50%] w-8 h-8 bg-white">
-                    <img className="rounded-[50%]" src="/avatar.jpg" alt="" />
-                </div>
+                <Avatar avatar={userData?.avatar_file || "/avatar.jpg"} size="md" />
                 <div className="flex flex-col">
                     <p>View Profile</p>
                     <p className="text-[9px] text-secondary">{userData?.login}</p>

@@ -14,7 +14,7 @@ interface IHeader{
 
 function Header({ChatOpen}:IHeader) {
     const contextMenu = useContextMenu();
-    const {isAuth} = useAuthUser();
+    const {isAuth,userData} = useAuthUser();
     const navigate = useNavigate();
     const notificationCount = 12;
     const messagesCount = 6;
@@ -38,7 +38,7 @@ function Header({ChatOpen}:IHeader) {
                     </Button>
                     <div ref={contextMenu.ref} className='relative'>
                         <div onClick={contextMenu.switchOpen} className='cursor-pointer'>
-                            <Avatar avatar="/avatar.jpg" size="md" />
+                            <Avatar avatar={userData?.avatar_file || "/avatar.jpg"} size="md" />
                         </div>
                         {contextMenu.isOpen && <ProfileDrawer drawerSwitch={contextMenu.switchOpen} />}
                     </div>

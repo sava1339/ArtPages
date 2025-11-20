@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { IComment } from "../interfaces/IComment";
 import supabase from "../supabaseClient";
+import { useUser } from "./users";
 
 export interface IUseComments{
     comments:IComment[],
@@ -51,6 +52,9 @@ export const useComments = create<IUseComments>((set,get)=>({
             .eq("post_id",post_id)
             .order("created_at", {ascending:false})
         if(error) throw error;
+        const userIds = data.map((comment:IComment)=>comment.user_id);
+        const uniqueUserIds = [...new Set(userIds)];
+        await useUser.getState().getUsersByIds(uniqueUserIds);
         get().addComments(data);
     }
 }))

@@ -38,7 +38,7 @@ function RecentPost({data}:IRecentPostEl) {
                 <div className="flex items-center gap-2 text-[12px]">
                     <p>{votes} рейтинг</p>
                     <p className='text-[10px]'>•</p>
-                    <p>111 комментариев</p>
+                    <p>{recentData.comment_count} комментариев</p>
                 </div>
             </div>
             <div style={{backgroundImage:`url(${recentData.post_file})`}} className='w-20 h-20 rounded-xl bg-center bg-cover cursor-pointer'></div>

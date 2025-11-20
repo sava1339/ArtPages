@@ -12,6 +12,7 @@ interface IUseUser{
     getUsersWithAvatar:(users:IUser[])=>Promise<IUser[]>,
     getUsersByLogin:(login:string)=>Promise<IUser>,
     getUsersById:(id:string)=>Promise<IUser>
+    getUsersByIds:(ids:string[])=>Promise<void>,
 }
 
 export const useUser = create<IUseUser>((set,get)=>({
@@ -28,6 +29,20 @@ export const useUser = create<IUseUser>((set,get)=>({
             ...users
         ]
     })),
+    getUsersByIds: async(ids)=>{
+        const otherUsers = get().users.map(user => user.id);
+        const filteredIds = ids.filter(id => !otherUsers.includes(id));
+        if(filteredIds.length === 0){
+            return;
+        }
+        const {data,error} = await supabase
+            .from("user")
+            .select("*")
+            .in("id",filteredIds);
+        if(error) throw error;
+        const usersWithFiles = await get().getUsersWithAvatar(data);
+        get().addUsers(usersWithFiles);
+    },
     getUser: async(getUserType,value)=>{
         switch(getUserType){
             case IGetUserType.byId:{

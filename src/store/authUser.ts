@@ -4,6 +4,7 @@ import type { Session } from "@supabase/supabase-js";
 import bcrypt from "bcryptjs";
 import supabase from "../supabaseClient";
 import { v4 } from "uuid";
+import { useUser } from "./users";
 
 interface IUseAuthUser{
     isAuth:boolean,
@@ -72,8 +73,9 @@ export const useAuthUser = create<IUseAuthUser>((set,get)=>({
             .eq("id",authData.session?.user.id)
             .single();
         if(userError) throw userError
+        const userDataWithAvatar = await useUser.getState().getUsersWithAvatar([userData]);
         set({
-            userData:userData,
+            userData:userDataWithAvatar[0],
             isAuth:true,
             session:authData.session
         })
