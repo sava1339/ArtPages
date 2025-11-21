@@ -15,15 +15,16 @@ import { get as getdb, set as setdb } from 'idb-keyval';
 export interface IUsePosts{
     posts:IPost[],
     postLists:any[],
-    deleteById:(id:string)=>void,
+    deleteById:(id:string)=>Promise<void>,
     setVotes:(id:string,votes:number)=>void,
     addPost:(post:IPost)=>void,
     addPosts:(newPosts:IPost[])=>void,
-    createPost:(title:string,desc:string,userId:number|string,communityId:number|string,image?:File)=>void,
+    createPost:(title:string,desc:string,userId:number|string,communityId:number|string,image?:File)=>Promise<void>,
     getPosts:(getPostType:IGetPostType,value?:string)=>void,
     getPostsAll:()=>Promise<IFetchPost[]>,
     getPostsByCommunityId:(community_id:string)=>Promise<IFetchPost[]>,
-    getPostsWithImages:(posts:IFetchPost[])=>Promise<IFetchPost[]>
+    getPostsWithImages:(posts:IFetchPost[])=>Promise<IFetchPost[]>,
+    getPostsByIds:(ids:string[])=>Promise<void>
 }
 
 export const usePosts = create<IUsePosts>((set,get)=>({
@@ -33,7 +34,11 @@ export const usePosts = create<IUsePosts>((set,get)=>({
     addPost:(post)=>set((state)=>({
         posts:[...state.posts,post]
     })),
-    deleteById: (id) => {
+    deleteById: async(id) => {
+        const {error} = await supabase.rpc("delete_post_and_file",{
+            post_id_to_delete:id
+        })
+        if(error) throw error;
         const newPosts = get().posts.filter(p => p.id !== id);
         set({ posts: newPosts });
     },
@@ -163,6 +168,21 @@ export const usePosts = create<IUsePosts>((set,get)=>({
             default:
                 return;
         }
+    },
+    getPostsByIds: async(ids)=>{
+        const otherPostsIds = get().posts.map(post => post.id);
+        const filteredIds = ids.filter(id => !otherPostsIds.includes(id));
+        if(filteredIds.length === 0){
+            return;
+        };
+        const {data,error} = await supabase
+            .rpc("get_posts_byids",{
+                post_ids:filteredIds
+            })
+        if(error) throw error;
+        const flatData = data.map((post:any) => post.post_data);
+        const postsWithFiles = await get().getPostsWithImages(flatData);
+        get().addPosts(postsWithFiles);
     },
     getPostsByCommunityId: async(community_id)=>{
         const {data,error} = await supabase

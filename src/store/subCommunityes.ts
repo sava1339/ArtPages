@@ -54,6 +54,9 @@ export const useSubCommunityes = create<IUseSubCommunityes>((set,get)=>({
         
     },
     getSubCommunity:async(user_id)=>{
+        if(get().subCommunity.length > 0){
+            return;
+        }
         const {data,error} = await supabase
             .from('community_subscription')
             .select("id,community_id,user_id,is_favorite")

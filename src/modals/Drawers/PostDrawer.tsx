@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { usePostBlackList } from "../../store/postBlackList";
 import { usePosts } from "../../store/posts";
 import Drawer from "./Drawer";
@@ -7,6 +8,7 @@ interface IPostDrawer{
 }
 
 function PostDrawer({id}:IPostDrawer) {
+    const navigate = useNavigate();
     const {addPostInBL} = usePostBlackList((state)=>state);
     const {deleteById} = usePosts((state)=>state);
     const reportPost = ()=>{
@@ -16,8 +18,9 @@ function PostDrawer({id}:IPostDrawer) {
     const hidePost = ()=>{
         addPostInBL(id);
     }
-    const deletePost = ()=>{
-        deleteById(id);
+    const deletePost = async()=>{
+        await deleteById(id);
+        navigate(0);
     }
     return ( 
         <Drawer className="text-secondary">

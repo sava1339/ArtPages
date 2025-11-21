@@ -11,12 +11,16 @@ import { routes_anon, routes_auth } from './routes/routes';
 import { useSubCommunityes } from './store/subCommunityes';
 import { useRecentCommunity } from './store/recentCommunity';
 import { useSavePosts } from './store/savePosts';
+import { useRecentPosts } from './store/recentPosts';
+import { usePosts } from './store/posts';
 
 function App() {
   const [isChatOpen,setIsChatOpen] = useState(false);
   const {getSubCommunity} = useSubCommunityes();
   const {getRecentCommunityes} = useRecentCommunity();
+  const {getRecentPosts} = useRecentPosts();
   const {getSaveByUser} = useSavePosts();
+  const {posts} = usePosts();
   const {auth,isAuth,userData} = useAuthUser();
   const selectedPost = useSelectedPost((state)=>state.selectedPost);
   const ChatOpen = () =>{
@@ -29,9 +33,13 @@ function App() {
     if(isAuth && userData){
       getSubCommunity(userData.id);
       getRecentCommunityes();
+      getRecentPosts();
       getSaveByUser(userData.id);
     }
   },[isAuth])
+  useEffect(()=>{
+    getRecentPosts();
+  },[posts])
   return (
     <>
       <Header ChatOpen={ChatOpen} />

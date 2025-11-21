@@ -86,7 +86,7 @@ function PostView({data}:IPostView) {
                                     }
                                 )}
                         >
-                            <img src={data.post_file} className="absolute z-10" alt="" />
+                            <img src={data.post_file} className="absolute z-10 h-full" alt="" />
                             <div style={{backgroundImage:`url(${data.post_file})`}} className="bg-center bg-cover blur-2xl top-0 left-0 w-full h-full" />
                         </div>}
                     </div>
