@@ -67,7 +67,6 @@ function Authentification() {
                     isRequired
                     placeholder="Почта" 
                     label="Почта"
-                    englishOnly
                 />
                 <Input 
                     onValueChange={(text)=>setPassword(text)} 

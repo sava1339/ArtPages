@@ -11,6 +11,7 @@ import type { IFetchPost } from "../interfaces/IFetchPost";
 import { useVotePost } from "./votePost";
 import type { IVote } from "../interfaces/IVote";
 import { get as getdb, set as setdb } from 'idb-keyval';
+import { useAuthUser } from "./authUser";
 
 export interface IUsePosts{
     posts:IPost[],
@@ -35,6 +36,9 @@ export const usePosts = create<IUsePosts>((set,get)=>({
         posts:[...state.posts,post]
     })),
     deleteById: async(id) => {
+        if(useAuthUser.getState().userData?.id !== get().posts.filter(post => post.id === id)[0].user_id){
+            return;
+        }
         const {error} = await supabase.rpc("delete_post_and_file",{
             post_id_to_delete:id
         })

@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { usePostBlackList } from "../../store/postBlackList";
 import { usePosts } from "../../store/posts";
 import Drawer from "./Drawer";
+import { useAuthUser } from "../../store/authUser";
+import type { IPost } from "../../interfaces/IPost";
 
 interface IPostDrawer{
     id:string,
@@ -11,6 +13,10 @@ function PostDrawer({id}:IPostDrawer) {
     const navigate = useNavigate();
     const {addPostInBL} = usePostBlackList((state)=>state);
     const {deleteById} = usePosts((state)=>state);
+    const {posts} = usePosts();
+    const curPost:IPost = posts.filter(post => post.id === id)[0];
+    const {isAuth,userData} = useAuthUser();
+    const isAdmin = userData?.id === curPost.user_id;
     const reportPost = ()=>{
         alert("Жалоба успешно отправлена!");
         addPostInBL(id);
@@ -36,14 +42,14 @@ function PostDrawer({id}:IPostDrawer) {
                 <img className="h-4" src="/hide.svg" alt="" />
                 <p className="group-hover:text-regular">Скрыть</p>
             </div>
-            <div className="group cursor-pointer flex gap-2 items-center px-6">
+            {isAdmin && <div className="group cursor-pointer flex gap-2 items-center px-6">
                 <img className="h-4" src="/edit.svg" alt="" />
                 <p className="group-hover:text-regular">Редактировать</p>
-            </div>
-            <div onClick={deletePost} className="group cursor-pointer flex gap-2 items-center px-6">
+            </div>}
+            {isAdmin && <div onClick={deletePost} className="group cursor-pointer flex gap-2 items-center px-6">
                 <img className="h-4" src="/delete.svg" alt="" />
                 <p className="group-hover:text-regular">Удалить</p>
-            </div>
+            </div>}
             <div onClick={reportPost} className="group cursor-pointer flex gap-2 items-center px-6">
                 <img className="h-4" src="/report.svg" alt="" />
                 <p className="group-hover:text-regular">Пожаловаться</p>

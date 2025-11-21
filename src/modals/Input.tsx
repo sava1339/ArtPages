@@ -31,7 +31,7 @@ function Input({
             }
         }else{
             const inputValue = e.target.value;
-            const englishOnly = inputValue.replace(/[^a-zA-Z\s]/g, '');
+            const englishOnly = inputValue.replace(/[^a-zA-Z\s_\-]/g, '');
             setValue(englishOnly);
             if(onValueChange){
                 onValueChange(englishOnly);
