@@ -8,6 +8,7 @@ interface IInput{
     placeholder?:string,
     password?:boolean,
     isRequired?:boolean,
+    englishOnly?:boolean,
     onValueChange?:(content:string)=>void,
 }
 
@@ -18,14 +19,25 @@ function Input({
     placeholder,
     password=false,
     isRequired=false,
+    englishOnly=false,
     onValueChange
 }:IInput) {
     const [value,setValue] = useState("");
     const changeValueHandler = (e:React.ChangeEvent<HTMLInputElement>) =>{
-        setValue(e.target.value);
-        if(onValueChange){
-            onValueChange(e.target.value);
+        if(!englishOnly){
+            setValue(e.target.value);
+            if(onValueChange){
+                onValueChange(e.target.value);
+            }
+        }else{
+            const inputValue = e.target.value;
+            const englishOnly = inputValue.replace(/[^a-zA-Z\s]/g, '');
+            setValue(englishOnly);
+            if(onValueChange){
+                onValueChange(englishOnly);
+            }
         }
+        
     }
     return ( 
 

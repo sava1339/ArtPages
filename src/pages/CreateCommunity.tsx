@@ -7,6 +7,8 @@ import Layout from "../layouts/Layout";
 import FileSelector from "../modals/FileSelector";
 import { useState } from "react";
 import { useCommunityes } from "../store/communityes";
+import { useAuthUser } from "../store/authUser";
+import { AUTH } from "../utils/consts";
 
 function CreateCommunity() {
     const navigate = useNavigate();
@@ -14,12 +16,23 @@ function CreateCommunity() {
     const [title,setTitle] = useState<string>("");
     const [avatar,setAvatar] = useState<File>();
     const {createCommunity} = useCommunityes();
+    const {isAuth} = useAuthUser();
     const createCommunityHandler = async() =>{
-        if(avatar==undefined || title.length < 4){
-            alert("Данные некоректны или не введены");
+        const titleFix = title.trim().replace(/\s/g, '_');
+        if(!isAuth){
+            alert("Вы не зарегистрированы");
+            navigate(AUTH);
             return;
         }
-        await createCommunity(title,desc,avatar);
+        if(titleFix.length < 4){
+            alert("Название сообщества слишком мало");
+            return;
+        }
+        if(avatar==undefined){
+            alert("Не выбрана аватарка сообщества");
+            return;
+        }
+        await createCommunity(titleFix,desc,avatar);
         navigate("/community/"+title)
     }
     const onDescChangeHandler = (context:string) =>{
@@ -46,6 +59,7 @@ function CreateCommunity() {
                         placeholder="Название сообщества" 
                         isRequired
                         label="Название сообщества" 
+                        englishOnly
                     />
                     <Textarea onValueChange={onDescChangeHandler} maxSymbols={500} placeholder="Описание сообщества" className="h-[200px]" label="Описание сообщества" />
                     <FileSelector onFileChange={onAvatarChangeHandler} label="Аватарка сообщества" />

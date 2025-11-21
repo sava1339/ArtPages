@@ -10,6 +10,9 @@ import Layout from "../layouts/Layout.tsx";
 import type { ICommunity } from "../interfaces/ICommunity.ts";
 import { IGetCommunityType } from "../interfaces/IGetCommunityType.ts";
 import { IGetPostType } from "../interfaces/IGetPostType.ts";
+import { useAuthUser } from "../store/authUser.ts";
+import { AUTH } from "../utils/consts.ts";
+import { useSubCommunityes } from "../store/subCommunityes.ts";
 
 
 function Commutnity() {
@@ -17,14 +20,12 @@ function Commutnity() {
     const navigate = useNavigate();
     const [com,setCom] = useState<ICommunity | null>(null);
     const [isLoading,setIsLoading] = useState(true);
-    const {posts,getPosts} = usePosts((state)=>state);
+    const {posts,getPosts} = usePosts();
     const {getCommunity} = useCommunityes();
     const filteredPosts = posts.filter(post => post.community_id === com?.id);
-    // const {addRecentCommunity} = useRecentCommunity((state)=>state);
-    // const {communityes,addCommunityes} = useCommunityes((state)=>state);
-    // const {addSubCommunity,removeSubCommunity,subCommunity} = useSubCommunityes((state)=>state);
-    // const curCommunity = communityes.filter(community => community.title == location.pathname.split('/')[2])[0];
-    // const isSub = subCommunity.some(community => community.communityId == curCommunity.id);
+    const {isAuth,userData} = useAuthUser();
+    const {addSubCommunity,subCommunity,removeSubCommunity} = useSubCommunityes();
+    const isSub = subCommunity.some(community => community.community_id == com?.id);
 
     useEffect(()=>{
         window.scrollTo(0, 0);
@@ -36,13 +37,23 @@ function Commutnity() {
             setIsLoading(false);
         }
         getData();
-    },[])
-    // const subCommunityHandler = ()=>{
-    //     addSubCommunity(curCommunity.id);
-    // }
-    // const unsubCommunityHandler = ()=>{
-    //     removeSubCommunity(curCommunity.id);
-    // }
+    },[location.pathname])
+    const subCommunityHandler = ()=>{
+        if(!isAuth || !userData){
+            navigate(AUTH);
+            return;
+        }
+        if(!com) return;
+        addSubCommunity(com.id,userData.id);
+    }
+    const unsubCommunityHandler = ()=>{
+        if(!isAuth || !userData){
+            navigate(AUTH);
+            return;
+        }
+        if(!com) return;
+        removeSubCommunity(com.id,userData.id)
+    }
     return (
         <Layout>
             {isLoading || com === null ? null
@@ -64,13 +75,13 @@ function Commutnity() {
                             <TextButton padding="none" className="flex gap-2 p-1.5 items-center justify-center border-[0.5px] border-secondary hover:border-regular">
                                 <img className="h-4 w-4" src="/notification.svg" alt="" />
                             </TextButton>
-                            {/* {!isSub ? <TextButton action={subCommunityHandler} className="flex gap-2 items-center py-1.5 bg-button hover:bg-action">
+                            {!isSub ? <TextButton action={subCommunityHandler} className="flex gap-2 items-center py-1.5 bg-button hover:bg-action">
                                 <p>Подписаться</p>
                             </TextButton>
                             :<TextButton action={unsubCommunityHandler} className="flex gap-2 items-center border-[0.5px] py-1.5 border-secondary hover:border-regular">
                                 <p>Подписаны</p>
                             </TextButton>
-                            } */}
+                            }
                             <TextButton padding="none" className="flex gap-2 p-1.5 items-center justify-center border-[0.5px] border-secondary hover:border-regular">
                                 <img className="h-4 w-4 rotate-90" src="/more.svg" alt="" />
                             </TextButton>

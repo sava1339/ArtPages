@@ -28,14 +28,15 @@ function Authentification() {
         },[])
     const auth = async() =>{
         if(type==="signup"){
+            const loginFix = login.trim().replace(/\s/g, '_');
             if(
                 nickname.length > 4 &&
-                login.length > 4 &&
+                loginFix.length > 4 &&
                 password.length > 6 &&
                 password === repeatPassword &&
                 email.includes("@") 
             ){
-                await signUp(email,nickname,login,password,bio,avatar);
+                await signUp(email,nickname,loginFix,password,bio,avatar);
                 navigate(0);
             }else{
                 alert("Введены некорректные данные");
@@ -66,6 +67,7 @@ function Authentification() {
                     isRequired
                     placeholder="Почта" 
                     label="Почта"
+                    englishOnly
                 />
                 <Input 
                     onValueChange={(text)=>setPassword(text)} 
@@ -89,6 +91,7 @@ function Authentification() {
                     isRequired
                     placeholder="Логин" 
                     label="Логин"
+                    englishOnly
                 />}
                 {type === "signup" && <Input 
                     onValueChange={(text)=>setNickname(text)}

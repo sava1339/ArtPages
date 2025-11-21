@@ -14,8 +14,8 @@ export interface IUseCommunityes{
     getCommunityAll:()=>Promise<ICommunity[]>,
     getCommunityByTitle:(title:string)=>Promise<ICommunity>,
     getCommunityById:(id:string)=>Promise<ICommunity>,
-    getCommunityesByIds:(ids:string[])=>void,
-    createCommunity:(title:string,desc:string,avatar:File)=>void
+    getCommunityesByIds:(ids:string[])=>Promise<void>,
+    createCommunity:(title:string,desc:string,avatar:File)=>Promise<void>
 }
 
 export const useCommunityes = create<IUseCommunityes>((set,get)=>({

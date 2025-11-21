@@ -7,7 +7,7 @@ export interface IUseSubCommunityes{
     subCommunity:ISubCommunity[],
     toggleFav:(subCommunityData:ISubCommunity,is_favorite:boolean)=>void,
     addSubCommunity:(community_id:string,user_id:string)=>void,
-    removeSubCommunity:(id:string)=>void,
+    removeSubCommunity:(community_id:string,user_id:string)=>void,
     getSubCommunity:(user_id:string)=>void,
     addSubCommunityes:(subCommunityes:ISubCommunity[])=>void
 }
@@ -31,6 +31,8 @@ export const useSubCommunityes = create<IUseSubCommunityes>((set,get)=>({
         
     },
     addSubCommunity: async(community_id,user_id)=> {
+        const isMatch = get().subCommunity.some(community => community.community_id === community_id)
+        if(isMatch) return;
         const {data,error} = await supabase
             .from("community_subscription")
             .insert({
@@ -39,11 +41,10 @@ export const useSubCommunityes = create<IUseSubCommunityes>((set,get)=>({
             })
             .select();
         if(error) throw error;
-        const subCommunity:any = data;
         set({
             subCommunity: [...get().subCommunity,
                 {
-                    id:subCommunity.id,
+                    id:data[0].id,
                     community_id:community_id,
                     user_id:user_id,
                     is_favorite:false
@@ -71,8 +72,14 @@ export const useSubCommunityes = create<IUseSubCommunityes>((set,get)=>({
             ]
         })
     },
-    removeSubCommunity: (id)=>{
-        const newSub = get().subCommunity.filter(community => community.id != id);
+    removeSubCommunity: async(community_id,user_id)=>{
+        const newSub = get().subCommunity.filter(community => community.community_id != community_id);
+        const {error} = await supabase
+            .from("community_subscription")
+            .delete()
+            .eq("user_id",user_id)
+            .eq("community_id",community_id)
+        if(error) throw error;
         set({subCommunity:newSub});
     }
 }))

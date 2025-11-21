@@ -14,7 +14,7 @@ function Avatar({
     size
 }:IAvatar) {
     return ( 
-        <div className={clsx("rounded-[50%] bg-white overflow-hidden",className,
+        <div className={clsx("rounded-[50%] flex justify-center items-center bg-white overflow-hidden",className,
             {
                 "w-4 h-4":size == "xs",
                 "w-6 h-6":size == "sm",
@@ -25,7 +25,7 @@ function Avatar({
                 "w-21 h-21":size == "3xl"
             }
         )}>
-            <img className="" src={avatar} alt="" />
+            <img className="h-full" src={avatar} alt="" />
             {children}
         </div>
      );
