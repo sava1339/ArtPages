@@ -15,7 +15,7 @@ function PostDrawer({id}:IPostDrawer) {
     const {deleteById} = usePosts((state)=>state);
     const {posts} = usePosts();
     const curPost:IPost = posts.filter(post => post.id === id)[0];
-    const {isAuth,userData} = useAuthUser();
+    const {userData} = useAuthUser();
     const isAdmin = userData?.id === curPost.user_id;
     const reportPost = ()=>{
         alert("Жалоба успешно отправлена!");
