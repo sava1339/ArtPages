@@ -15,10 +15,10 @@ import { useCommunityes } from '../store/communityes';
 import type { IPost } from '../interfaces/IPost';
 import type { IUseIsVertical } from '../store/isVertical';
 import type { IUseCommunityes } from '../store/communityes';
-import type { ICommunity } from '../interfaces/ICommunity';
-import type { IUseSelectedPost } from '../store/selectedPost';
 import { useComments } from '../store/comments';
 import { useUser } from '../store/users';
+import { useNavigate } from 'react-router-dom';
+import Spinner from './Spinner';
 
 interface IPostView{
     data:IPost
@@ -26,25 +26,32 @@ interface IPostView{
 
 function PostView({data}:IPostView) {
     dayjs.extend(relativeTime);
+    const navigate = useNavigate();
     const [isMoreContent,setIsMoreContent] = useState(true);
     const {isVertical,verticalToggle} = useIsVertical((state:IUseIsVertical)=>state);
-    const {communityes} = useCommunityes((state:IUseCommunityes)=>state);
-    const {comments,sendComment,getCommentsByPost} = useComments((state)=>state);
-    const {users} = useUser();
-    const curUser = users.filter(user=> user.id === data.user_id)[0];
-    const filterComments = comments.filter(comment=>comment.post_id === data.id);
-    const curCommunity = communityes.filter((community:ICommunity) => community.id === data.community_id)[0];
-    const {deselect} = useSelectedPost((state:IUseSelectedPost)=>state);
+    const [isLoading,setIsLoading] = useState(true);
+    const {getCommunityById} = useCommunityes((state:IUseCommunityes)=>state);
+    const {sendComment,fetchCommentsByPost,getCommentsByPost} = useComments((state)=>state);
+    const {getUserById} = useUser();
+    const {deselect} = useSelectedPost();
+
+    const curUser = getUserById(data.user_id);
+    const curComments = getCommentsByPost(data.id);
+    const curCommunity =  getCommunityById(data.community_id);
     const lastUpdate = dayjs(data.created_at);
     const sendCommentHandler = (userId:string,context:string) =>{
         sendComment(userId,data.id,context);
     }
     useEffect(()=>{
-        getCommentsByPost(data.id);
+        const getData = async()=>{
+            await fetchCommentsByPost(data.id);
+            setIsLoading(false);
+        }
+        getData();
     },[])
     return ( 
         <div className="fixed top-0 h-screen z-40 w-screen">
-            <div className="absolute absolute-center-x text-regular bg-main z-20 h-screen overflow-y-scroll w-[1000px] py-4 px-6 flex flex-col gap-4">
+            {curCommunity && curUser && !isLoading ? <div className="absolute absolute-center-x text-regular bg-main z-20 h-screen overflow-y-scroll w-[1000px] py-4 px-6 flex flex-col gap-4">
                 <div className="flex justify-between items-center">
                     <div className="flex gap-1 items-center text-[12px]">
                         <Avatar className="cursor-pointer mr-1" avatar={curCommunity.avatar_file} size="md" />
@@ -54,7 +61,7 @@ function PostView({data}:IPostView) {
                                 <p>•</p>
                                 <p className="text-secondary">{lastUpdate.fromNow()}</p>
                             </div>
-                            <p className=" text-[10px] text-secondary">{curUser.login}</p>
+                            <p onClick={()=>navigate(`/user/${curUser.login}`)} className=" text-[10px] text-secondary cursor-pointer">{curUser.login}</p>
                         </div>
                     </div>
                     <div className='flex gap-2'>
@@ -124,13 +131,14 @@ function PostView({data}:IPostView) {
                         </div>
                         <MessageField send={sendCommentHandler} placeholder="Присоеденись к обсуждению!" />
                         <div className='flex flex-col gap-2'>
-                            {filterComments.map(comment=>(
+                            {curComments.map(comment=>(
                                 <Comment comment={comment} key={comment.id} />
                             ))}
                         </div>
                     </div>
                 </div>
             </div>
+            : <Spinner/>}
             <div className="bg-black opacity-40 h-full w-full"></div>
         </div>
      );

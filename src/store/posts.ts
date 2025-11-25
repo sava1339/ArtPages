@@ -21,11 +21,12 @@ export interface IUsePosts{
     addPost:(post:IPost)=>void,
     addPosts:(newPosts:IPost[])=>void,
     createPost:(title:string,desc:string,userId:number|string,communityId:number|string,image?:File)=>Promise<void>,
-    getPosts:(getPostType:IGetPostType,value?:string)=>void,
-    getPostsAll:()=>Promise<IFetchPost[]>,
-    getPostsByCommunityId:(community_id:string)=>Promise<IFetchPost[]>,
+    fetchPosts:(getPostType:IGetPostType,value?:string)=>void,
+    fetchPostsAll:()=>Promise<IFetchPost[]>,
+    fetchPostsByCommunityId:(community_id:string)=>Promise<IFetchPost[]>,
     getPostsWithImages:(posts:IFetchPost[])=>Promise<IFetchPost[]>,
-    getPostsByIds:(ids:string[])=>Promise<void>
+    fetchPostsByIds:(ids:string[])=>Promise<void>,
+    getPostById: (id:string) => IPost|undefined
 }
 
 export const usePosts = create<IUsePosts>((set,get)=>({
@@ -125,14 +126,14 @@ export const usePosts = create<IUsePosts>((set,get)=>({
         ) as IFetchPost[];
         return postsWithImages;
     },
-    getPosts: async(getPostType:IGetPostType,value?:string)=>{
+    fetchPosts: async(getPostType:IGetPostType,value?:string)=>{
         const postList: IPost[] = [];
         let communityList:ICommunity[] = [];
         let userList:IUser[] = [];
         let voteList:IVote[] = [];
         switch (getPostType) {
             case IGetPostType.all:{
-                const data = await get().getPostsAll();
+                const data = await get().fetchPostsAll();
                 data.forEach(item => {
                     const { community, votes, user, ...post } = item;
                     postList.push(post as IPost);
@@ -153,7 +154,7 @@ export const usePosts = create<IUsePosts>((set,get)=>({
             }
             case IGetPostType.byCommunityId:{
                 if(!value) return;
-                const data = await get().getPostsByCommunityId(value)
+                const data = await get().fetchPostsByCommunityId(value)
                 data.forEach(item => {
                     const { community, votes, user, ...post } = item;
                     postList.push(post as IPost);
@@ -173,7 +174,7 @@ export const usePosts = create<IUsePosts>((set,get)=>({
                 return;
         }
     },
-    getPostsByIds: async(ids)=>{
+    fetchPostsByIds: async(ids)=>{
         const otherPostsIds = get().posts.map(post => post.id);
         const filteredIds = ids.filter(id => !otherPostsIds.includes(id));
         if(filteredIds.length === 0){
@@ -188,7 +189,7 @@ export const usePosts = create<IUsePosts>((set,get)=>({
         const postsWithFiles = await get().getPostsWithImages(flatData);
         get().addPosts(postsWithFiles);
     },
-    getPostsByCommunityId: async(community_id)=>{
+    fetchPostsByCommunityId: async(community_id)=>{
         const {data,error} = await supabase
             .rpc("get_community_posts",{
                 page_limit: 10,
@@ -200,7 +201,7 @@ export const usePosts = create<IUsePosts>((set,get)=>({
         const posts = await get().getPostsWithImages(flatData);
         return posts;
     },
-    getPostsAll: async()=>{
+    fetchPostsAll: async()=>{
         const {data,error} = await supabase
             .rpc("get_feed_posts",{
                 page_limit: 10,
@@ -210,5 +211,9 @@ export const usePosts = create<IUsePosts>((set,get)=>({
         const flatData = data.map((post:any) => post.post_data);
         const posts = await get().getPostsWithImages(flatData);
         return posts;
+    },
+    getPostById: (id)=>{
+        const curPost = get().posts.find(post => post.id === id);
+        return curPost;
     }
 }))

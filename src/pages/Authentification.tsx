@@ -30,13 +30,13 @@ function Authentification() {
         if(type==="signup"){
             const loginFix = login.trim().replace(/\s/g, '_');
             if(
-                nickname.length > 4 &&
                 loginFix.length > 4 &&
                 password.length > 6 &&
                 password === repeatPassword &&
                 email.includes("@") 
             ){
-                await signUp(email,nickname,loginFix,password,bio,avatar);
+                const nicknameFix = nickname.trim() === "" ? loginFix : nickname.trim();
+                await signUp(email,nicknameFix,loginFix,password,bio,avatar);
                 navigate(0);
             }else{
                 alert("Введены некорректные данные");
@@ -91,12 +91,13 @@ function Authentification() {
                     placeholder="Логин" 
                     label="Логин"
                     englishOnly
+                    maxSymbols={48}
                 />}
                 {type === "signup" && <Input 
                     onValueChange={(text)=>setNickname(text)}
-                    placeholder="Никнейм" 
+                    placeholder={login.trim() === "" ? "Никнейм" : login.trim()} 
                     label="Никнейм" 
-                    maxSymbols={24} 
+                    maxSymbols={48}
                 />}
                 {type === "signup" && <FileSelector 
                     label="Аватарка" 

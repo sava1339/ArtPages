@@ -6,9 +6,10 @@ import { useUser } from "./users";
 export interface IUseComments{
     comments:IComment[],
     addComments:(comment:IComment[])=>void,
-    sendComment:(user_id:string,post_id:string,context:string)=>void,
+    sendComment:(user_id:string,post_id:string,context:string)=>Promise<void>,
     removeComment:(id:string)=>void,
-    getCommentsByPost: (post_id:string)=>void
+    fetchCommentsByPost: (post_id:string)=>Promise<void>,
+    getCommentsByPost: (post_id:string)=>IComment[]
 }
 
 export const useComments = create<IUseComments>((set,get)=>({
@@ -42,7 +43,7 @@ export const useComments = create<IUseComments>((set,get)=>({
             comments:newCommentList
         })
     },
-    getCommentsByPost: async(post_id)=>{
+    fetchCommentsByPost: async(post_id)=>{
         if(get().comments.some(comment => comment.post_id === post_id)){
             return;
         }
@@ -54,7 +55,11 @@ export const useComments = create<IUseComments>((set,get)=>({
         if(error) throw error;
         const userIds = data.map((comment:IComment)=>comment.user_id);
         const uniqueUserIds = [...new Set(userIds)];
-        await useUser.getState().getUsersByIds(uniqueUserIds);
+        await useUser.getState().fetchUsersByIds(uniqueUserIds);
         get().addComments(data);
+    },
+    getCommentsByPost: (post_id) =>{
+        const comments = get().comments.filter(comment => comment.post_id === post_id);
+        return comments;
     }
 }))

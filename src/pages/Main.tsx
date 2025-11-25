@@ -8,9 +8,10 @@ import type { IPost } from '../interfaces/IPost';
 import { usePostBlackList } from '../store/postBlackList';
 import Layout from '../layouts/Layout';
 import { IGetPostType } from "../interfaces/IGetPostType";
+import Spinner from "../components/Spinner";
 
 function Main() {
-    const {posts,getPosts} = usePosts();
+    const {posts,fetchPosts} = usePosts();
     const {postBlackList} = usePostBlackList();
     const [isLoading,setIsLoading] = useState(true);
     const location = useLocation();
@@ -29,7 +30,7 @@ function Main() {
             setIsLoading(false);
         }
         const getData = async() =>{
-            getPosts(IGetPostType.all);
+            fetchPosts(IGetPostType.all);
             setIsLoading(false);
         }
         getData();
@@ -40,11 +41,12 @@ function Main() {
                 {location.pathname == "/popular" && <TopScroll posts={posts}/>}
                 <div className="flex">
                     <div className="flex w-[732px] flex-col justify-center items-center gap-4">
-                        {!isLoading && filterPosts && filterPosts.map((post:IPost)=>( 
+                        {!isLoading && filterPosts ? filterPosts.map((post:IPost)=>( 
                             <div key={post.id} className="border-t border-secondary">
                                 <Post data={post} />
                             </div>
-                        ))}
+                        )) 
+                        : <Spinner/>}
                     </div>
                     <SocialAside/>
                 </div>

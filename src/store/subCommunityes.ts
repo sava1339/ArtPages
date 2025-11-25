@@ -63,7 +63,7 @@ export const useSubCommunityes = create<IUseSubCommunityes>((set,get)=>({
             .eq("user_id",user_id)
         if(error) throw error;
         const communityIds = data.map(subCommunity => subCommunity.community_id);
-        await useCommunityes.getState().getCommunityesByIds(communityIds);
+        await useCommunityes.getState().fetchCommunityesByIds(communityIds);
         get().addSubCommunityes(data);
     },
     addSubCommunityes:(subCommunityes)=>{

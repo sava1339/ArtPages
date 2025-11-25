@@ -7,13 +7,15 @@ interface IRecentCommunity{
 }
 
 function RecentCommunity({id}:IRecentCommunity) {
-    const {communityes} = useCommunityes((state)=>state);
-    const curCommunity = communityes.filter(community => community.id === id)[0];
+    const {getCommunityById} = useCommunityes((state)=>state);
+    const curCommunity = getCommunityById(id);
     return ( 
-        <SidebarButton route={`/community/${curCommunity.title}`}>
-            <Avatar avatar={curCommunity.avatar_file || "/avatar.svg"} size="md"/>
-            <p className='text-ellipsis line-clamp-1'>{curCommunity.title}</p>
-        </SidebarButton>
+        <>
+            {curCommunity && <SidebarButton route={`/community/${curCommunity?.title}`}>
+                <Avatar avatar={curCommunity?.avatar_file} size="md"/>
+                <p className='text-ellipsis line-clamp-1'>{curCommunity?.title}</p>
+            </SidebarButton>}
+        </>
      );
 }
 

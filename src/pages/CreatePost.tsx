@@ -23,13 +23,13 @@ function CreatePost() {
     const [image,setImage] = useState<File>();
     const [com,setCom] = useState<ICommunity|null>(null);
     const {createPost} = usePosts();
-    const {getCommunity} = useCommunityes();
+    const {fetchCommunity} = useCommunityes();
     const {userData} = useAuthUser();
     const params = new URLSearchParams(location.search);
     const type = params.get("type");
     useEffect(()=>{
         const getData = async()=>{
-            const community:ICommunity|null = await getCommunity(IGetCommunityType.byTitle,location.pathname.split('/')[2]);
+            const community:ICommunity|null = await fetchCommunity(IGetCommunityType.byTitle,location.pathname.split('/')[2]);
             if(community === null) alert("Произошла ошибка");
             setCom(community);
             setIsLoading(false);

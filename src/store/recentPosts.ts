@@ -21,7 +21,9 @@ export const useRecentPosts = create<IUseRecentPosts>((set,get)=>({
             userid: useAuthUser.getState().userData?.id,
             ids: [id,...newRecentList]
         }
-        await setdb(`recentPost_${idsArray.userid}`,JSON.stringify(idsArray.ids));
+        if(useAuthUser.getState().isAuth){
+            await setdb(`recentPost_${idsArray.userid}`,JSON.stringify(idsArray.ids));
+        }
         set({
             recentPosts:[...newRecentList,
                 id
@@ -44,7 +46,7 @@ export const useRecentPosts = create<IUseRecentPosts>((set,get)=>({
             return;
         }
         const recentPosts:string[] = await JSON.parse(recentPostsJSON);
-        await usePosts.getState().getPostsByIds(recentPosts);
+        await usePosts.getState().fetchPostsByIds(recentPosts);
         const existRecentPosts = recentPosts.filter(recentPost => usePosts.getState().posts.some(post => post.id === recentPost));
         await setdb(`recentPost_${useAuthUser.getState().userData?.id}`,JSON.stringify(existRecentPosts));
         set({

@@ -23,12 +23,12 @@ function Post({data}:IPostEl) {
     dayjs.extend(relativeTime);
     const navigate = useNavigate();
     const lastUpdate = dayjs(data.created_at);
-    const {selectPost} = useSelectedPost((state)=>state);
+    const {selectPost} = useSelectedPost();
     const contextMenu = useContextMenu();
-    const {communityes} = useCommunityes((state)=>state);
-    const curCommunity = communityes.filter((community) => community.id === data.community_id)[0];
-    const {addRecent} = useRecentPosts((state)=>state);
-    const {subCommunity,addSubCommunity} = useSubCommunityes((state)=>state);
+    const {getCommunityById} = useCommunityes();
+    const curCommunity = getCommunityById(data.community_id);
+    const {addRecent} = useRecentPosts();
+    const {subCommunity,addSubCommunity} = useSubCommunityes();
     const {isAuth,userData} = useAuthUser();
     const isSub = subCommunity.some(community => community.community_id == data.community_id);
     const postClickHandler = () =>{
@@ -44,7 +44,7 @@ function Post({data}:IPostEl) {
     }
     return (
     <>
-        <div onClick={postClickHandler} className="flex flex-col text-regular p-2 w-[700px] hover:bg-mainselect rounded-xl mt-2 cursor-pointer">
+        {curCommunity && <div onClick={postClickHandler} className="flex flex-col text-regular p-2 w-[700px] hover:bg-mainselect rounded-xl mt-2 cursor-pointer">
             <div className="flex justify-between items-center">
                 <Link onClick={(e)=>e.stopPropagation()} to={`/community/${curCommunity.title}`} className="flex gap-1 items-center text-[10px]">
                     <Avatar className="mr-1" avatar={curCommunity.avatar_file} size="sm" />
@@ -85,7 +85,7 @@ function Post({data}:IPostEl) {
                     <p className='text-[12px] font-semibold'>Поделится</p>
                 </TextButton>
             </div>
-        </div>
+        </div>}
     </> 
     );
 }

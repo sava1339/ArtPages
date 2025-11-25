@@ -17,7 +17,9 @@ export const useRecentCommunity = create<IUseRecentCommunity>((set,get)=>({
             userid: useAuthUser.getState().userData?.id,
             ids: [id,...newRecentCommunityList]
         }
-        await setdb(`recentCommunity_${idsArray.userid}`,JSON.stringify(idsArray.ids));
+        if(useAuthUser.getState().isAuth){
+            await setdb(`recentCommunity_${idsArray.userid}`,JSON.stringify(idsArray.ids));
+        }
         set({
             recentCommunity:[id,...newRecentCommunityList]
         })
@@ -25,7 +27,7 @@ export const useRecentCommunity = create<IUseRecentCommunity>((set,get)=>({
     getRecentCommunityes: async()=>{
         const recentCommunityesJson = await getdb(`recentCommunity_${useAuthUser.getState().userData?.id}`);
         const recentCommunityes = await JSON.parse(recentCommunityesJson);
-        await useCommunityes.getState().getCommunityesByIds(recentCommunityes);
+        await useCommunityes.getState().fetchCommunityesByIds(recentCommunityes);
         set({
             recentCommunity: recentCommunityes
         })

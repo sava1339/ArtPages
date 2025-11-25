@@ -9,23 +9,30 @@ import { v4 } from "uuid";
 export interface IUseCommunityes{
     communityes:ICommunity[],
     addCommunityes:(communityes:ICommunity[])=>void,
-    getCommunity:(getCommunityType:IGetCommunityType,value:any)=>Promise<ICommunity|null>,
+    fetchCommunity:(getCommunityType:IGetCommunityType,value:any)=>Promise<ICommunity|null>,
     getCommunityesWithFiles:(communityes:ICommunity[])=>Promise<ICommunity[]>,
-    getCommunityAll:()=>Promise<ICommunity[]>,
-    getCommunityByTitle:(title:string)=>Promise<ICommunity>,
-    getCommunityById:(id:string)=>Promise<ICommunity>,
-    getCommunityesByIds:(ids:string[])=>Promise<void>,
-    createCommunity:(title:string,desc:string,avatar:File)=>Promise<void>
+    fetchCommunityAll:()=>Promise<ICommunity[]>,
+    fetchCommunityByTitle:(title:string)=>Promise<ICommunity>,
+    fetchCommunityById:(id:string)=>Promise<ICommunity>,
+    fetchCommunityesByIds:(ids:string[])=>Promise<void>,
+    createCommunity:(title:string,desc:string,avatar:File)=>Promise<void>,
+    getCommunityById: (community_id:string) => ICommunity|undefined
 }
 
 export const useCommunityes = create<IUseCommunityes>((set,get)=>({
     communityes:[
         
     ],
-    addCommunityes:(communityes)=>set((state)=>({
-        communityes:[...state.communityes,...communityes]
-    })),
-    getCommunity: async(getCommunityType,value) =>{
+    addCommunityes:(communityes)=>{
+        const uniqueCommunityes = Array.from(
+            new Map(communityes.map(community => [community.id, community])).values()
+        );
+        const newCommunityList = uniqueCommunityes.filter(community => !get().communityes.includes(community));
+        set({
+            communityes:[...get().communityes,...newCommunityList]
+        })
+    },
+    fetchCommunity: async(getCommunityType,value) =>{
         switch(getCommunityType){
             case IGetCommunityType.byTitle:{
                 const match = get().communityes.filter(community => community.title === value);
@@ -33,7 +40,7 @@ export const useCommunityes = create<IUseCommunityes>((set,get)=>({
                     useRecentCommunity.getState().addRecentCommunity(match[0].id);
                     return match[0];
                 }
-                const community:ICommunity = await get().getCommunityByTitle(value);
+                const community:ICommunity = await get().fetchCommunityByTitle(value);
                 get().addCommunityes([community]);
                 useRecentCommunity.getState().addRecentCommunity(community.id);
                 return community;
@@ -44,7 +51,7 @@ export const useCommunityes = create<IUseCommunityes>((set,get)=>({
                     useRecentCommunity.getState().addRecentCommunity(match[0].id);
                     return match[0];
                 }
-                const community:ICommunity = await get().getCommunityById(value);
+                const community:ICommunity = await get().fetchCommunityById(value);
                 get().addCommunityes([community]);
                 useRecentCommunity.getState().addRecentCommunity(community.id);
                 return community;
@@ -54,7 +61,7 @@ export const useCommunityes = create<IUseCommunityes>((set,get)=>({
             }
         }
     },
-    getCommunityesByIds:async(ids:string[])=>{
+    fetchCommunityesByIds:async(ids:string[])=>{
         const otherCommunityIds = get().communityes.map(community => community.id);
         const filteredIds = ids.filter(id => !otherCommunityIds.includes(id));
         if(filteredIds.length === 0){
@@ -100,7 +107,7 @@ export const useCommunityes = create<IUseCommunityes>((set,get)=>({
         ) as ICommunity[];
         return communityesWithFiles;
     },
-    getCommunityAll: async()=>{
+    fetchCommunityAll: async()=>{
         const {data,error} = await supabase
             .from("community")
             .select("*");
@@ -108,7 +115,7 @@ export const useCommunityes = create<IUseCommunityes>((set,get)=>({
         const communityesWithFiles = await get().getCommunityesWithFiles(data);
         return communityesWithFiles;
     },
-    getCommunityByTitle: async(title)=>{
+    fetchCommunityByTitle: async(title)=>{
         const {data,error} = await supabase
             .from("community")
             .select("*")
@@ -117,7 +124,7 @@ export const useCommunityes = create<IUseCommunityes>((set,get)=>({
         const communityesWithFiles = await get().getCommunityesWithFiles(data);
         return communityesWithFiles[0];
     },
-    getCommunityById: async(id)=>{
+    fetchCommunityById: async(id)=>{
         const {data,error} = await supabase
             .from("community")
             .select("*")
@@ -148,5 +155,9 @@ export const useCommunityes = create<IUseCommunityes>((set,get)=>({
         }
         uploadImage();
         createCommunity();
+    },
+    getCommunityById: (community_id)=>{
+        const curCommunity = get().communityes.find(community => community.id === community_id);
+        return curCommunity;
     }
 }))

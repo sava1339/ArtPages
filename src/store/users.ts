@@ -8,11 +8,12 @@ interface IUseUser{
     users:IUser[],
     addUser:(user:IUser)=>void,
     addUsers:(users:IUser[])=>void,
-    getUser:(getUserType:IGetUserType,value:string)=>Promise<IUser|null>,
+    fetchUser:(getUserType:IGetUserType,value:string)=>Promise<IUser|null>,
     getUsersWithAvatar:(users:IUser[])=>Promise<IUser[]>,
-    getUsersByLogin:(login:string)=>Promise<IUser>,
-    getUsersById:(id:string)=>Promise<IUser>
-    getUsersByIds:(ids:string[])=>Promise<void>,
+    fetchUsersByLogin:(login:string)=>Promise<IUser>,
+    fetchUsersById:(id:string)=>Promise<IUser>
+    fetchUsersByIds:(ids:string[])=>Promise<void>,
+    getUserById:(user_id:string)=>IUser|undefined;
 }
 
 export const useUser = create<IUseUser>((set,get)=>({
@@ -29,7 +30,7 @@ export const useUser = create<IUseUser>((set,get)=>({
             ...users
         ]
     })),
-    getUsersByIds: async(ids)=>{
+    fetchUsersByIds: async(ids)=>{
         const otherUsers = get().users.map(user => user.id);
         const filteredIds = ids.filter(id => !otherUsers.includes(id));
         if(filteredIds.length === 0){
@@ -43,14 +44,14 @@ export const useUser = create<IUseUser>((set,get)=>({
         const usersWithFiles = await get().getUsersWithAvatar(data);
         get().addUsers(usersWithFiles);
     },
-    getUser: async(getUserType,value)=>{
+    fetchUser: async(getUserType,value)=>{
         switch(getUserType){
             case IGetUserType.byId:{
                 const match = get().users.filter(user=>user.id===value);
                 if(match.length>0){
                     return match[0];
                 }
-                const user:IUser = await get().getUsersById(value);
+                const user:IUser = await get().fetchUsersById(value);
                 get().addUser(user);
                 return user;
             }
@@ -59,7 +60,7 @@ export const useUser = create<IUseUser>((set,get)=>({
                 if(match.length>0){
                     return match[0];
                 }
-                const user:IUser = await get().getUsersByLogin(value);
+                const user:IUser = await get().fetchUsersByLogin(value);
                 get().addUser(user);
                 return user;
             }
@@ -100,7 +101,7 @@ export const useUser = create<IUseUser>((set,get)=>({
         ) as IUser[];
         return usersWithFiles;
     },
-    getUsersByLogin: async(login)=>{
+    fetchUsersByLogin: async(login)=>{
         const {data,error}= await supabase
             .from("user")
             .select("*")
@@ -109,7 +110,7 @@ export const useUser = create<IUseUser>((set,get)=>({
         const userArr = await get().getUsersWithAvatar(data);
         return userArr[0];
     },
-    getUsersById: async(id)=>{
+    fetchUsersById: async(id)=>{
         const {data,error}= await supabase
             .from("user")
             .select("*")
@@ -117,5 +118,9 @@ export const useUser = create<IUseUser>((set,get)=>({
         if(error) throw error;
         const userArr = await get().getUsersWithAvatar(data);
         return userArr[0];
+    },
+    getUserById: (user_id) =>{
+        const curUser = get().users.find(user => user.id === user_id);
+        return curUser;
     }
 }))

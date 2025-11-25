@@ -20,8 +20,8 @@ function Commutnity() {
     const navigate = useNavigate();
     const [com,setCom] = useState<ICommunity | null>(null);
     const [isLoading,setIsLoading] = useState(true);
-    const {posts,getPosts} = usePosts();
-    const {getCommunity} = useCommunityes();
+    const {posts,fetchPosts} = usePosts();
+    const {fetchCommunity} = useCommunityes();
     const filteredPosts = posts.filter(post => post.community_id === com?.id);
     const {isAuth,userData} = useAuthUser();
     const {addSubCommunity,subCommunity,removeSubCommunity} = useSubCommunityes();
@@ -30,9 +30,9 @@ function Commutnity() {
     useEffect(()=>{
         window.scrollTo(0, 0);
         const getData = async()=>{
-            const community:ICommunity|null = await getCommunity(IGetCommunityType.byTitle,location.pathname.split('/')[2]);
+            const community:ICommunity|null = await fetchCommunity(IGetCommunityType.byTitle,location.pathname.split('/')[2]);
             if(community === null) alert("Произошла ошибка");
-            getPosts(IGetPostType.byCommunityId,community?.id);
+            fetchPosts(IGetPostType.byCommunityId,community?.id);
             setCom(community);
             setIsLoading(false);
         }
