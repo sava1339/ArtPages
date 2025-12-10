@@ -19,6 +19,7 @@ import { useComments } from '../store/comments';
 import { useUser } from '../store/users';
 import { useNavigate } from 'react-router-dom';
 import Spinner from './Spinner';
+import type { IUser } from '../interfaces/IUser';
 
 interface IPostView{
     data:IPost
@@ -35,7 +36,7 @@ function PostView({data}:IPostView) {
     const {getUserById} = useUser();
     const {deselect} = useSelectedPost();
 
-    const curUser = getUserById(data.user_id);
+    const [curUser,setCurUser] = useState<IUser>();
     const curComments = getCommentsByPost(data.id);
     const curCommunity =  getCommunityById(data.community_id);
     const lastUpdate = dayjs(data.created_at);
@@ -45,6 +46,8 @@ function PostView({data}:IPostView) {
     useEffect(()=>{
         const getData = async()=>{
             await fetchCommentsByPost(data.id);
+            const user = await getUserById(data.user_id);
+            setCurUser(user);
             setIsLoading(false);
         }
         getData();

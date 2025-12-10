@@ -4,6 +4,8 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useUser } from "../store/users";
 import Spinner from "./Spinner";
+import { useEffect, useState } from "react";
+import type { IUser } from "../interfaces/IUser";
 
 interface ICommentEl{
     comment:IComment
@@ -13,7 +15,14 @@ function Comment({comment}:ICommentEl) {
     dayjs.extend(relativeTime);
     const lastUpdate = dayjs(comment.created_at);
     const {getUserById} = useUser();
-    const curUser = getUserById(comment.user_id);
+    const [curUser,setCurUser] = useState<IUser>();
+    useEffect(()=>{
+        const getUser = async()=>{
+            const user = await getUserById(comment.user_id);
+            setCurUser(user);
+        }
+        getUser();
+    },[])
     return ( 
         <>
             {curUser ? <div className='flex gap-2'>

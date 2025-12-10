@@ -13,7 +13,8 @@ interface IUseChatRooms{
     // createGroup: (name:string,user_id:string)=>Promise<void>,
     addChatRooms: (chatRooms:IChatRoom[]) => void,
     selectRoom:(room_id:string)=>void,
-    getChatRoomById:(room_id:string)=> IChatRoom|undefined
+    getChatRoomById:(room_id:string)=> IChatRoom|undefined,
+    updateImageNTitle: (room_id:string,image_url:string, title:string) => void
 }
 
 export const useChatRooms = create<IUseChatRooms>((set,get)=>({
@@ -29,16 +30,33 @@ export const useChatRooms = create<IUseChatRooms>((set,get)=>({
         const chatRoomList:IChatRoom[] = [];
         const roomMemberList:IRoomMember[] = [];
         flat_data.forEach(item =>{
-            const {chat_room, members_count, room_member} = item;
+            const {room_members, created_at, members_count, id, name} = item;
+            const member_uuids:string[] = room_members.map(member => member.user_id);
             const chatRoom:IChatRoom = {
-                ...chat_room,
-                member_count:members_count
+                id:id,
+                name:name,
+                created_at: created_at,
+                members_count: members_count,
+                member_uuids:member_uuids
             }
             chatRoomList.push(chatRoom);
-            roomMemberList.push(room_member);
+            roomMemberList.push(...room_members);
         })
         get().addChatRooms(chatRoomList);
         useRoomMemebers.getState().addRoomMembers(roomMemberList);
+    },
+    updateImageNTitle: (room_id,image_url,title) =>{
+        const room = get().chatRooms.find(room => room.id === room_id);
+        if(!room) return;
+        room.avatar = image_url;
+        room.name = title;
+        const newRoomList = get().chatRooms.filter(room => room.id !== room_id);
+        set({
+            chatRooms: [
+                ...newRoomList,
+                room
+            ]
+        })
     },
     // createRoomWithOther: async(name,user_id,other_user_id)=>{
     //     return;

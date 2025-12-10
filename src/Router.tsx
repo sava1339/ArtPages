@@ -14,13 +14,11 @@ import { useSavePosts } from './store/savePosts';
 import { useRecentPosts } from './store/recentPosts';
 import { usePosts } from './store/posts';
 import { useChatRooms } from './store/chatRooms';
-import { useCommunityes } from './store/communityes';
 
 function App() {
   const [isChatOpen,setIsChatOpen] = useState(false);
   const {getSubCommunity} = useSubCommunityes();
   const {getRecentCommunityes} = useRecentCommunity();
-  const {communityes} = useCommunityes();
   const {getRecentPosts} = useRecentPosts();
   const {getSaveByUser} = useSavePosts();
   const {fetchRoomsByUser} = useChatRooms();

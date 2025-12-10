@@ -10,7 +10,7 @@ interface IUseAuthUser{
     isAuth:boolean,
     userData:IUser|null,
     session:Session|null,
-    signUp:(email:string,nickname:string,login:string,password:string,bio:string,avatar?:File|null)=>Promise<void>,
+    signUp:(email:string,nickname:string,login:string,password:string,bio:string,avatar:File)=>Promise<void>,
     signIn:(email:string,password:string)=>Promise<void>,
     signOut:()=>Promise<void>,
     auth:()=>Promise<void>,
@@ -24,22 +24,18 @@ export const useAuthUser = create<IUseAuthUser>((set,get)=>({
 
     signUp: async(email,nickname,login,password,bio,avatar)=>{
         const hashPassword = await get().generateJWT(password);
-        const filename = avatar != null ? v4()+".jpg" : "99e0c52f-9ad8-43f9-8b0f-df76f44afc56.jpg";
+        const filename = v4()+".jpg";
         const {data:signup,error:signupError} = await supabase.auth.signUp({
             email:email,
             password:password
         })
         if(signupError) throw signupError;
-        console.log(signup);
-        const uploadImage = async()=>{
-            const { error } = await supabase.storage
-                .from('avatar_images')
-                .upload(filename, avatar);
-            if (error) throw error;
-        }
-        if(avatar!=null){
-            uploadImage();
-        }
+        const { error:uploadError } = await supabase.storage
+            .from('avatar_images')
+            .upload(filename, avatar);
+        if (uploadError){
+            throw uploadError;
+        };
         const {error} = await supabase
             .from("user")
             .insert(

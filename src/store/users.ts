@@ -13,7 +13,7 @@ interface IUseUser{
     fetchUsersByLogin:(login:string)=>Promise<IUser>,
     fetchUsersById:(id:string)=>Promise<IUser>
     fetchUsersByIds:(ids:string[])=>Promise<void>,
-    getUserById:(user_id:string)=>IUser|undefined;
+    getUserById:(user_id:string)=>Promise<IUser>;
 }
 
 export const useUser = create<IUseUser>((set,get)=>({
@@ -119,8 +119,12 @@ export const useUser = create<IUseUser>((set,get)=>({
         const userArr = await get().getUsersWithAvatar(data);
         return userArr[0];
     },
-    getUserById: (user_id) =>{
+    getUserById: async(user_id) =>{
         const curUser = get().users.find(user => user.id === user_id);
+        if(!curUser){
+            const user = await get().fetchUsersById(user_id);
+            return user;
+        }
         return curUser;
     }
 }))

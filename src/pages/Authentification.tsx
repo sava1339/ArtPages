@@ -7,12 +7,15 @@ import { useEffect, useState } from "react";
 import Textarea from "../modals/Textarea";
 import FileSelector from "../modals/FileSelector";
 import { useAuthUser } from "../store/authUser";
+import Spinner from "../components/Spinner";
+import { HOME_ROUTE } from "../utils/consts";
 
 function Authentification() {
     const navigate = useNavigate();
     const location = useLocation();
     const [nickname,setNickname] = useState("");
     const [login,setLogin] = useState("");
+    const [isLoading,setIsLoading] = useState(false);
     const [password,setPassword] = useState("");
     const [repeatPassword,setRepeatPassword] = useState("");
     const [bio,setBio] = useState("");
@@ -27,17 +30,19 @@ function Authentification() {
             }
         },[])
     const auth = async() =>{
+        setIsLoading(true);
         if(type==="signup"){
             const loginFix = login.trim().replace(/\s/g, '_');
             if(
                 loginFix.length > 4 &&
                 password.length > 6 &&
                 password === repeatPassword &&
+                avatar &&
                 email.includes("@") 
             ){
                 const nicknameFix = nickname.trim() === "" ? loginFix : nickname.trim();
                 await signUp(email,nicknameFix,loginFix,password,bio,avatar);
-                navigate(0);
+                navigate(HOME_ROUTE);
             }else{
                 alert("Введены некорректные данные");
             }
@@ -47,15 +52,16 @@ function Authentification() {
                 password.length > 6
             ){
                 await signIn(email,password);
-                navigate(0);
+                navigate(HOME_ROUTE);
             }else{
                 alert("Введены некорректные данные");
             }
         }
+        setIsLoading(false)
     }
     return ( 
         <Layout>
-            <div className="w-[600px] flex flex-col text-regular gap-2">
+            {!isLoading ? <div className="w-[600px] flex flex-col text-regular gap-2">
                 <div className="flex justify-between">
                     <h2 className="font-semibold text-[21px]">
                         {type === "signup" ? "Регистрация" : "Вход"}
@@ -132,7 +138,7 @@ function Authentification() {
                         </TextButton>
                     </div>
                 </div>
-            </div>
+            </div> : <Spinner/>}
         </Layout>
      );
 }

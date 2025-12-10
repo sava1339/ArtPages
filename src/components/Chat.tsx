@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {clsx} from 'clsx';
 import Button from '../modals/Buttons/Button';
 import { useContextMenu } from "./hooks/useContextMenu";
@@ -9,6 +9,9 @@ import { useMessages } from "../store/messages";
 import ChatMessage from "./ChatMessage";
 import ChatGroup from "./ChatGroup";
 import { useChatRooms } from "../store/chatRooms";
+import Spinner from "./Spinner";
+import type { IMessage } from "../interfaces/IMessage";
+import type { IChatRoom } from "../interfaces/IChatRoom";
 
 interface IChatEl{
     ChatOpen:()=>void
@@ -16,10 +19,54 @@ interface IChatEl{
 
 function Chat({ChatOpen}:IChatEl) {
     const [isMinimize,setIsMinimize] = useState(false);
-    const {messages} = useMessages();
-    const {chatRooms} = useChatRooms();
+    const {messages,subscribeToRoom,fetchMessagesByRoom,sendMessage} = useMessages();
+    const [viewMessages,setViewMessages] = useState<IMessage[]>([]);
+    const {chatRooms,selectRoomId} = useChatRooms();
+    const [chatIsLoading,setChatIsLoading] = useState(true);
+    const [curRoom,setCurRoom] = useState<IChatRoom>();
+
     const contextMenu = useContextMenu();
+    const boxMessages = useRef<HTMLDivElement|null>(null);
     const messagesCount = 99;
+    useEffect(()=>{
+        const getData = async() =>{
+            setChatIsLoading(true);
+            if(!selectRoomId){
+                setChatIsLoading(false);
+                return;
+            }
+            subscribeToRoom(selectRoomId);
+            await fetchMessagesByRoom(selectRoomId);
+            setViewMessages(messages.filter(messages => messages.room_id === selectRoomId));
+            setCurRoom(chatRooms.find(room => room.id === selectRoomId));
+            setChatIsLoading(false);
+            scrollBoxMessage();
+        }
+        getData();
+    },[selectRoomId])
+    useEffect(()=>{
+        chatRooms.map(async(room) => {
+            await fetchMessagesByRoom(room.id);
+        })
+    },[])
+    const scrollBoxMessage = () => {
+        if(boxMessages.current){
+            boxMessages.current.scrollTo({
+                top: boxMessages.current.scrollHeight,
+                behavior:"instant"
+            });
+        }
+    }
+    useEffect(()=>{
+        scrollBoxMessage();
+        setViewMessages(messages.filter(messages => messages.room_id === selectRoomId))
+    },[messages,boxMessages])
+    const sendHandler = (userId:string,context:string) =>{
+        if(!selectRoomId){
+            return;
+        }
+        sendMessage(selectRoomId,userId,context);
+    }
     return ( 
         <div 
         className={
@@ -69,25 +116,25 @@ function Chat({ChatOpen}:IChatEl) {
                     </div>
                     <div className="flex flex-col flex-1 pt-4">
                         <div className="flex justify-between border-b border-secondary pl-3 pr-6 pb-2">
-                            <div className="flex gap-2 items-center">
-                                <Avatar avatar="/avatar.jpg" size="md" />
-                                <p className="text-[16px] font-bold text-secondary">Username</p>
-                            </div>
+                            {selectRoomId ? <div className="flex gap-2 items-center">
+                                <Avatar avatar={curRoom?.avatar || "/avatar.jpg"} size="md" />
+                                <p className="text-[16px] font-bold text-secondary">{curRoom?.name}</p>
+                            </div> : <div></div>}
                             <div className="flex gap-1 items-center">
                                 <Button imgSize="xs1" img="/settingsalt.svg" />
                                 <Button imgSize="xs2" action={()=>setIsMinimize(true)} img="/minimize.svg" />
                                 <Button imgSize="xs" action={ChatOpen} img="/close.svg" />
                             </div>
                         </div>
-                        <div className="flex flex-col gap-2 flex-1">
+                        {!chatIsLoading ? <div ref={boxMessages} onLoad={scrollBoxMessage} className="flex flex-col gap-2 overflow-y-scroll">
                             {
-                                messages.map(message=>(
+                                viewMessages.map(message=>(
                                     <ChatMessage key={message.id} message={message} />
                                 ))
                             }
-                        </div>
-                        <div className="px-2 py-2">
-                            <MessageField textareaPlaceholder="Сообщение" selected noresize />
+                        </div> : <Spinner/>}
+                        <div className="px-2 py-2 flex-1 flex items-end">
+                            <MessageField send={sendHandler} textareaPlaceholder="Сообщение" selected noresize />
                         </div>
                     </div>
                 </div>
